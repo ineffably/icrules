@@ -4,13 +4,13 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const outDir = 'lib';
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   devtool: 'inline-source-map',
   entry: './src/index.ts',
   output: {
-    filename: `[name].js`,
+    filename: `index.js`,
     path: path.join(__dirname, outDir),
-    library: { name: 'icrules', type: 'umd' }
+    library: { name: 'core', type: 'umd' }
   },
   module: {
     rules: [

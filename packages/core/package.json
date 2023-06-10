@@ -2,10 +2,13 @@
   "name": "@icrules/core",
   "version": "0.1.0",
   "description": "A small fast rules engine with a tiny JSON footprint with optional results insights for debugging",
-  "main": "lib/main.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "jest --config ../../jest.config.js ./test/core.test.ts",
-    "build": "webpack"
+    "build": "webpack",
+    "clean": "rm -rf ./lib",
+    "watch": "webpack watch",
+    "build.clean": "npm run clean && npm run build"
   },
   "keywords": [],
   "author": "",

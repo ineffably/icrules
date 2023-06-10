@@ -1,27 +1,28 @@
 const webpack = require('webpack');
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const outDir = 'lib';
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   devtool: 'inline-source-map',
   entry: './src/index.ts',
   output: {
     path: path.join(__dirname, outDir),
-    filename: `index.js`,
-    library: { name: 'editor', type: 'umd' }
+    filename: `examples.js`
   },
+  
   devServer: {
-    port: 8880
+    port: 8880,
+    static: {
+      directory: path.join(__dirname, './'),
+      publicPath: '/'
+    },
   },
-  externals: {
-    React: 'react',
-    ReactDOM: 'react-dom',
-    'react': 'React',
-    'react-dom': 'ReactDOM',
-    'react': 'react',
-    'react-dom': 'react-dom'
-  },
+  // externals: {
+  //   React: 'react',
+  //   ReactDOM: 'react-dom'
+  // },
   module: {
     rules: [
       {
@@ -37,5 +38,10 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
-  }
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, './index.html')
+    }),
+  ]
 }
