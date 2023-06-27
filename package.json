@@ -8,8 +8,8 @@
     "editor": "npm run editor --workspace=editor",
     "clean": "npm run clean --workspaces --if-present",
     "examples": "npm run examples --workspace=@icrules/examples",
-    "build.watch": "concurrently \"npm run watch --workspace=@icrules/core\" \"npm run watch --workspace=@icrules/editor\"",
-    "build.clean": "npm run build.clean --workspaces --if-present"
+    "build:watch": "concurrently \"npm run watch --workspace=@icrules/core\" \"npm run watch --workspace=@icrules/editor\"",
+    "build:clean": "npm run build.clean --workspaces --if-present"
   },
   "keywords": [
     "rules",
