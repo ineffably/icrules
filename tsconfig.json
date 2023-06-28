@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "outDir": "./build",
     "incremental": true,
     "module": "commonjs",
     "target": "ES2021",
@@ -21,6 +22,7 @@
     "node_modules",
     "lib",
     "dist",
+    "build/**/*",
     "babel.config.js",
     "jest.config.js",
     "wepback.config.js"

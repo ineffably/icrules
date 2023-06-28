@@ -1,7 +1,6 @@
 {
   "name": "icrules",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.1.0",
   "scripts": {
     "test": "npm run test --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
@@ -9,7 +8,7 @@
     "clean": "npm run clean --workspaces --if-present",
     "examples": "npm run examples --workspace=@icrules/examples",
     "build:watch": "concurrently \"npm run watch --workspace=@icrules/core\" \"npm run watch --workspace=@icrules/editor\"",
-    "build:clean": "npm run build.clean --workspaces --if-present"
+    "build:clean": "npm run build:clean --workspaces --if-present"
   },
   "keywords": [
     "rules",
@@ -31,7 +30,6 @@
     "concurrently": "^8.1.0",
     "eslint": "^8.42.0",
     "jest": "^29.5.0",
-    "jest-webpack-resolver": "^0.3.0",
     "lerna": "^6.6.2",
     "ts-jest": "^29.1.0"
   },
@@ -39,5 +37,8 @@
     "packages/core",
     "packages/editor",
     "packages/examples"
-  ]
+  ],
+  "dependencies": {
+    "ts-jest-resolver": "^2.0.1"
+  }
 }

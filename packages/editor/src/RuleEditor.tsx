@@ -1,5 +1,6 @@
-import { Operator, Quantifiers, Rule, RuleGroup, operators } from '@icrules/core';
 import { useEffect, useState } from 'react';
+import { ICRulesEditorProps, RuleEditorProps, RuleGroupEditorProps } from '.';
+import { Operator, operators, Quantifiers, Rule, RuleGroup } from '@icrules/core';
 import './editorStyle.css';
 
 export const opMap = {
@@ -16,15 +17,6 @@ export const opMap = {
 };
 
 let lastId = null;
-
-interface RuleEditorProps {
-  facts?: any;
-  rule?: Rule;
-  onUpdate?: (r: Rule, i: number) => void;
-  onDeleteRule?: (number) => void;
-  index?: number;
-  depth?: number;
-}
 
 const RuleEditor = ({
   facts = {},
@@ -83,14 +75,6 @@ const RuleEditor = ({
       </div>
     </div>
   )
-}
-
-interface RuleGroupEditorProps {
-  facts?: any;
-  rules?: RuleGroup;
-  onChange?: (RuleGroup, index, parentIndex?) => void;
-  depth?: number;
-  index?: number;
 }
 
 const RuleGroupEditor = ({ facts = {}, rules = {}, onChange = r => { }, depth = 0, index = 0 }: RuleGroupEditorProps) => {
@@ -176,12 +160,6 @@ const RuleGroupEditor = ({ facts = {}, rules = {}, onChange = r => { }, depth = 
       </div>
     </div>
   )
-}
-
-export interface ICRulesEditorProps {
-  rules: RuleGroup;
-  facts: any;
-  onChange?: (RuleGroup) => void;
 }
 
 export const ICRulesEditor = ({ rules = {}, facts = {}, onChange = r => null }: ICRulesEditorProps) => {

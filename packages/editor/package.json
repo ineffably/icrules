@@ -7,7 +7,7 @@
     "clean": "rm -rf ./lib",
     "build": "webpack",
     "watch": "webpack watch",
-    "build.clean": "npm run clean && npm run build"
+    "build:clean": "npm run clean && npm run build"
   },
   "keywords": [],
   "author": "",
