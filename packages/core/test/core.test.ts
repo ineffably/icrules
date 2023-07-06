@@ -178,5 +178,48 @@ describe('icrules verification', () => {
       expect(processResult.groupCount).toBe(1);
     });
 
+    it('should allow the plugin to change the outcome', () => {
+      const alwaysTrue = () => ({ hit: true })
+      const trueResults = process({ all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, facts, [alwaysTrue]);
+      expect(trueResults.hit).toBe(true);
+      expect(Object.keys(trueResults).length).toBe(1);
+      expect(Object.keys(trueResults)[0]).toBe('hit');
+    })
+
+    it('should allow a plugin that just changest the group outcome', () => {
+      const alwaysTrue = ({ group, hit }) => ({ hit: group ? true : hit });
+      const trueResults = process({ all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, facts, [alwaysTrue]);
+      expect(trueResults.hit).toBe(true);
+      expect(Object.keys(trueResults).length).toBe(1);
+      expect(Object.keys(trueResults)[0]).toBe('hit');
+    })
+
+    it('should still process a plugin that returns null, undefined, empty object', () => {
+      const justNull = () => null as any;
+      const justUndefined = () => undefined as any;
+      const justEmptyObject = () => ({} as any)
+      const justNumber = () => (1 as any)
+
+      const nullPlugin = process({ all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, facts, [justNull]);
+      expect(nullPlugin.hit).toBe(false);
+      expect(Object.keys(nullPlugin).length).toBe(1);
+      expect(Object.keys(nullPlugin)[0]).toBe('hit');
+
+      const undefinedPlugin = process({ all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, facts, [justUndefined]);
+      expect(undefinedPlugin.hit).toBe(false);
+      expect(Object.keys(undefinedPlugin).length).toBe(1);
+      expect(Object.keys(undefinedPlugin)[0]).toBe('hit');
+
+      const emptyObjectPlugin = process({ all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, facts, [justEmptyObject]);
+      expect(emptyObjectPlugin.hit).toBe(false);
+      expect(Object.keys(emptyObjectPlugin).length).toBe(1);
+      expect(Object.keys(emptyObjectPlugin)[0]).toBe('hit');
+
+      const numberPlugin = process({ all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, facts, [justNumber]);
+      expect(numberPlugin.hit).toBe(false);
+      expect(Object.keys(numberPlugin).length).toBe(1);
+      expect(Object.keys(numberPlugin)[0]).toBe('hit');
+    });
+
   })
 });
