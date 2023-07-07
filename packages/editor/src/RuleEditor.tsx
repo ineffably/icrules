@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ICRulesEditorProps, RuleEditorProps, RuleGroupEditorProps } from '.';
 import { Operator, operators, Quantifiers, Rule, RuleGroup } from '@icrules/core';
+import { FactsEditor } from './FactsEditor';
 import './editorStyle.css';
 
 export const opMap = {
@@ -39,7 +40,7 @@ const RuleEditor = ({
   const termId = `term-${key}`
 
   return (
-    <div className='rule-editor' key={key}>
+    <div key={key} className='rule-editor'>
       <div key={'rule-fact'} className="rule-entry rule-fact">
         <input
           id={termId}
@@ -77,11 +78,20 @@ const RuleEditor = ({
   )
 }
 
-const RuleGroupEditor = ({ facts = {}, rules = {}, onChange = r => { }, depth = 0, index = 0 }: RuleGroupEditorProps) => {
-  const [quantfiers] = useState(['all', 'any'] as Quantifiers[]);
+const RuleGroupEditor = ({
+  facts = {},
+  rules = {},
+  onChange = r => { },
+  depth = 0,
+  index = 0,
+  showFactsEditor = true
+}: RuleGroupEditorProps) => {
+  const [liveFacts, setLiveFacts] = useState(facts);
   const [quantifier, setQuantifier] = useState((rules.all ? 'all' : 'any') as Quantifiers);
   const [liveRules, setLiveRules] = useState(rules);
   const [ruleList, setLiveRuleList] = useState([...(liveRules.all || liveRules.any)]);
+  const [versboseResult, setVerboseResult] = useState({} as any);
+  const quantfiers = ['all', 'any'] as Quantifiers[];
   const emptyRule = ['', 'eq', ''] as Rule;
   const emptyGroup = { all: [emptyRule] } as RuleGroup;
 
@@ -125,6 +135,13 @@ const RuleGroupEditor = ({ facts = {}, rules = {}, onChange = r => { }, depth = 
 
   return (
     <div className="rule-group-editor" key={`group-edit-${index}-${depth}`}>
+      {showFactsEditor && depth === 0 && index === 0 && <div>
+        <FactsEditor object={liveFacts} onChange={(value, isValid) => {
+          if (isValid) {
+            setLiveFacts(value);
+          }
+        }} />
+      </div>}
       <div className="rule-entry quantifier">
         <select value={quantifier} onChange={ev => setQuantifier(ev.target.value as Quantifiers)}>
           {quantfiers.map(q => (<option value={q}>{q}</option>))}
@@ -137,7 +154,7 @@ const RuleGroupEditor = ({ facts = {}, rules = {}, onChange = r => { }, depth = 
             <RuleEditor
               onUpdate={onRuleUpdate}
               key={`${JSON.stringify(ruleEntry)}-${ruleIndex}-${depth}`}
-              {...{ rule: ruleEntry, facts, index: ruleIndex, depth }}
+              {...{ rule: ruleEntry, facts: liveFacts, index: ruleIndex, depth }}
             />
             <div className="addrule">
               <button title='add a rule' onClick={() => onAddRule(ruleIndex + 1)}>+</button>
@@ -147,23 +164,31 @@ const RuleGroupEditor = ({ facts = {}, rules = {}, onChange = r => { }, depth = 
           (<div className="editor-wrap">
             <RuleGroupEditor
               key={`${JSON.stringify(ruleEntry)}-${ruleIndex}-${depth}`}
-              {...{ rules: ruleEntry as RuleGroup, facts, index: ruleIndex, depth: (depth + 1), onChange: (ruleGroup, i, parentIndex) => {
-                ruleList[ruleIndex] = ruleGroup
-                onChange({ [quantifier]: [...ruleList] }, i, ruleIndex)
-              } }}
+              {...{
+                rules: ruleEntry as RuleGroup, facts, index: ruleIndex, depth: (depth + 1), onChange: (ruleGroup, i, parentIndex) => {
+                  ruleList[ruleIndex] = ruleGroup
+                  onChange({ [quantifier]: [...ruleList] }, i, parentIndex)
+                }
+              }}
             />
             <div className="addgroup">
               {ruleIndex > 0 && <button title='remove group' onClick={() => onDeleteRule(ruleIndex)}>--</button>}
             </div>
           </div>)
-        )}  
+        )}
       </div>
     </div>
   )
 }
 
-export const ICRulesEditor = ({ rules = {}, facts = {}, onChange = r => null }: ICRulesEditorProps) => {
+export const ICRulesEditor = ({
+  rules = {},
+  facts = {},
+  onChange = (r => null),
+  options = { showFactsEditor: true }
+}: ICRulesEditorProps) => {
   const [liveRules, setLiveRules] = useState(rules);
+  const { showFactsEditor } = options;
 
   const onRuleChange = (latestRules: RuleGroup) => {
     onChange(latestRules);
@@ -171,7 +196,7 @@ export const ICRulesEditor = ({ rules = {}, facts = {}, onChange = r => null }: 
   }
 
   return (
-    <RuleGroupEditor {...{ rules: liveRules, facts, onChange: onRuleChange }} />
+    <RuleGroupEditor {...{ rules: liveRules, facts, onChange: onRuleChange, showFactsEditor }} />
   )
 }
 

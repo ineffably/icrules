@@ -19,10 +19,21 @@ export interface RuleGroupEditorProps {
   onChange?: (RuleGroup, index, parentIndex?) => void;
   depth?: number;
   index?: number;
+  showFactsEditor?: boolean;
+}
+
+export interface RulesEditorOptions {
+  showFactsEditor?: boolean;
+}
+
+export interface FactsEditorProps {
+  object: any;
+  onChange?: (string, boolean)=>void;
 }
 
 export interface ICRulesEditorProps {
   rules: RuleGroup;
   facts: any;
   onChange?: (RuleGroup) => void;
+  options?: RulesEditorOptions;
 }

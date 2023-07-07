@@ -1,6 +1,8 @@
-import { useState } from 'react';
 import RuleEditor from '@icrules/editor';
+import { useState } from 'react';
 import { RuleGroup } from '@icrules/core';
+import { syntaxHighlight } from './utils';
+import './examples.css';
 
 export const Examples = () => {
   const rules = {
@@ -25,9 +27,14 @@ export const Examples = () => {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <RuleEditor {...{ facts, rules: liveRules, onChange }} />
-      <div><pre>{JSON.stringify(liveRules, null, 2)}</pre></div>
+    <div>
+      <div><b>ICRules Editor Example</b></div>
+      <div style={{ display: 'flex', flexDirection: 'row', width: '98vw' }}>
+        <RuleEditor {...{ facts, rules: liveRules, onChange }} />
+        <div style={{ width: '300px' }}>
+          <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(liveRules, null, 2)) }}></pre>
+        </div>
+      </div>
     </div>
   )
 }
