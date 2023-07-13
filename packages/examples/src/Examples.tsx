@@ -10,7 +10,7 @@ export const Examples = () => {
       ['color', 'eq', 'blue'],
       ['size', 'gte', 10],
       ['size', 'lte', 300],
-      { any: [['count', 'gt', 3]] }
+      { any: [['count', 'lt', 3]] }
     ]
   } as RuleGroup;
 

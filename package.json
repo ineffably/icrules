@@ -17,7 +17,10 @@
     "rules editor",
     "integrated"
   ],
-  "author": "Chad Neff",
+  "author": {
+		"name": "Chad Neff",
+		"email": "chad@neffsaid.com"
+	},
   "license": "MIT",
   "description": "",
   "devDependencies": {

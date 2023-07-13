@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ICRulesEditorProps, RuleEditorProps, RuleGroupEditorProps } from '.';
-import { Operator, operators, Quantifiers, Rule, RuleGroup } from '@icrules/core';
+import { Operator, operators, processRule, processVerbose, Quantifiers, Rule, RuleGroup } from '@icrules/core';
 import { FactsEditor } from './FactsEditor';
 import './editorStyle.css';
 
@@ -64,7 +64,8 @@ const RuleEditor = ({
         </select>
       </div>
       <div key={'rule-term'} className="rule-entry rule-term">
-        <input type='text'
+        <input 
+          type='text'
           id={valueId}
           value={term}
           autoFocus={lastId === valueId}
@@ -132,6 +133,12 @@ const RuleGroupEditor = ({
   useEffect(() => {
     onChange({ [quantifier]: [...ruleList] }, 0, index);
   }, [quantifier])
+
+  const isValidRule = processRule(facts, rules);
+  const verboseResults = processVerbose(facts, rules);
+  console.log('isValidRule', isValidRule); 
+  // console.log(JSON.stringify(rules, null, 2));
+  console.log('verboseResults', JSON.stringify(verboseResults, null, 2));
 
   return (
     <div className="rule-group-editor" key={`group-edit-${index}-${depth}`}>
