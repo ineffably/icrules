@@ -15,7 +15,6 @@ module.exports = {
   collectCoverageFrom: [
     '<rootDir>/packages/core/src/**/*.ts',
     '<rootDir>/packages/editor/src/**/*.ts',
-    '<rootDir>/packages/editor/src/**/*.tsx',
   ],
   testMatch: [
     '<rootDir>/packages/core/test/**/*.test.ts',

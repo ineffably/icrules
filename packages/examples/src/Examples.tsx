@@ -1,6 +1,6 @@
 import RuleEditor from '@icrules/editor';
 import { useState } from 'react';
-import { RuleGroup } from '@icrules/core';
+import { RuleGroup, processVerbose } from '@icrules/core';
 import { syntaxHighlight } from './utils';
 import './examples.css';
 
@@ -25,7 +25,7 @@ export const Examples = () => {
   const onChange = (rules: RuleGroup) => {
     setLiveRules(rules);
   }
-
+  const { pass, group } = processVerbose(facts, liveRules);
   return (
     <div>
       <div><b>ICRules Editor Example</b></div>
@@ -33,6 +33,9 @@ export const Examples = () => {
         <RuleEditor {...{ facts, rules: liveRules, onChange }} />
         <div style={{ width: '300px' }}>
           <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(liveRules, null, 2)) }}></pre>
+        </div>
+        <div style={{ width: '300px' }}>
+          <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify({ pass, group }, null, 2)) }}></pre>
         </div>
       </div>
     </div>

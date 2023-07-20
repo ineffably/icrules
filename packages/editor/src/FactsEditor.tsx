@@ -19,6 +19,9 @@ export const FactsEditor = ({ object, onChange = () => null }: FactsEditorProps)
 
   return (
     <div>
+      <div className='facts-status' style={{ color: parsedValue ? 'green' : 'darkred' }}>
+        Facts are {parsedValue ? 'valid' : 'invalid'}
+      </div>
       <textarea
         title='enter your facts here'
         onChange={ev => {
@@ -28,9 +31,6 @@ export const FactsEditor = ({ object, onChange = () => null }: FactsEditorProps)
         style={{ width: '300px', height: '300px' }}
         value={activeObject}>
       </textarea>
-      <div className='facts-status' style={{ color: parsedValue ? 'green' : 'darkred' }}>
-        Facts are {parsedValue ? 'valid' : 'invalid'}
-      </div>
     </div>
   )
 

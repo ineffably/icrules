@@ -1,3 +1,4 @@
+import { Facts } from '../lib';
 import ICRulesDefault, { ICRules, verbosePlugin } from '../src';
 
 describe('icrules verification', () => {
@@ -5,10 +6,20 @@ describe('icrules verification', () => {
   const facts = {
     sky: 'blue',
     count: 32,
+    id: '123456',
     colors: ['red', 'green', 'blue'],
     months: [4, 5, 6],
     market: 'en-US',
-    markets: ['en-CA', 'en-US']
+    markets: ['en-CA', 'en-US'],
+    'name.last' : 'Smith',
+    selectedProfile: {
+      profileId: '1234',
+      name: 'Jack',
+      products: 20,
+      background: { 
+        color: 'blue'
+      }
+    }
   };
 
   const serializedFacts = JSON.stringify(facts);
@@ -25,6 +36,11 @@ describe('icrules verification', () => {
     it('should fail if the rule group is invalid', () => {
       expect(process(facts, [['sky', 'eq', 'blue']] as any).pass).toBe(false);
       expect(process(facts, { some: [['sky', 'eq', 'blue']] } as any).pass).toBe(false);
+    });
+
+    it('should fail if the facts are invalid', () => {
+      expect(process(undefined, { all: [['sky', 'eq', 'blue']] } as any).pass).toBe(false);
+      expect(process(null, { all: [['sky', 'eq', 'blue']] } as any).pass).toBe(false);
     });
 
     it('should process all and any quantifiers against multiple rules in a single RuleGroup', () => {
@@ -66,6 +82,15 @@ describe('icrules verification', () => {
   })
 
   describe('should utilize eq and neq operators', () => {
+    it('should infer the term type based on the fact type', () => {
+      expect(process(facts, { all: [['count', 'eq', '32']] }).pass).toBe(true);
+      expect(process(facts, { all: [['count', 'eq', 32]] }).pass).toBe(true);
+      expect(process(facts, { all: [['id', 'eq', 123456]] }).pass).toBe(false);
+      expect(process(facts, { all: [['id', 'eq', '123456']] }).pass).toBe(true);
+    })
+  })
+
+  describe('should utilize eq and neq operators', () => {
     it('should process eq and neq rules against facts with expected results', () => {
       expect(process(facts, { all: [['sky', 'eq', 'blue']] }).pass).toBe(true);
       expect(process(facts, { all: [['sky', 'neq', 'blue']] }).pass).toBe(false);
@@ -74,14 +99,14 @@ describe('icrules verification', () => {
       expect(process(facts, { all: [['sky', 'eq', 0]] }).pass).toBe(false);
       expect(process(facts, { all: [['count', 'neq', 0]] }).pass).toBe(true);
 
-      // with eq types are compared
+      // with eq types are compared with inferred values
       expect(process(facts, { all: [['count', 'neq', '0']] }).pass).toBe(true);
-      expect(process(facts, { all: [['count', 'eq', '32']] }).pass).toBe(false);
+      expect(process(facts, { all: [['count', 'eq', '32']] }).pass).toBe(true);
 
       // let's try with hydrating serialized facts...
       expect(process(hydratedFacts, { all: [['count', 'neq', 0]] }).pass).toBe(true);
       expect(process(hydratedFacts, { all: [['count', 'neq', '0']] }).pass).toBe(true);
-      expect(process(hydratedFacts, { all: [['count', 'eq', '32']] }).pass).toBe(false);
+      expect(process(hydratedFacts, { all: [['count', 'eq', '32']] }).pass).toBe(true);
     })
   });
 
@@ -222,5 +247,25 @@ describe('icrules verification', () => {
       expect(Object.keys(numberPlugin)[0]).toBe('pass');
     });
 
+  })
+
+  describe('rules should query facts with objects', () => {
+    it('should be able to query a fact with an object value and have a distinction between object and fields with dots', () => {
+      expect(process(facts, { any: [['selectedProfile.background.color', 'eq', 'blue']] }).pass).toBe(true);
+      expect(process(facts, { any: [['selectedProfile.products', 'lt', 25]] }).pass).toBe(true);
+      expect(process(facts, { any: [['selectedProfile.products', 'lt', '25']] }).pass).toBe(true);
+      expect(process(facts, { any: [['selectedProfile.products', 'gt', '15']] }).pass).toBe(true);
+      expect(process(facts, { any: [['selectedProfile.products', 'gt', 15]] }).pass).toBe(true);
+      expect(process(facts, { any: [['selectedProfile.products', 'lt', 15]] }).pass).toBe(false);
+      expect(process(facts, { any: [['selectedProfile.products', 'neq', 15]] }).pass).toBe(true);
+      expect(process(facts, { any: [['selectedProfile.language', 'eq', 'en']] }).pass).toBe(false);
+      
+      // non-existent should still not pass
+      expect(process(facts, { any: [['blahblah.nothinghere', 'lt', 25]] }).pass).toBe(false);
+      
+      // should distinguish between fields with dots and objects
+      expect(process(facts, { any: [['name.last', 'eq', 'Smith']] }).pass).toBe(true);
+      expect(process(facts, { any: [['name.last', 'eq', 'Wilson']] }).pass).toBe(false);
+    })
   })
 });

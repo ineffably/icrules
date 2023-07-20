@@ -9,13 +9,23 @@
   padding: 2px 0;
 }
 
-.rule-entry {
-  margin: 2px 0px;
-  padding: 2px 8px;
+.rules {
+  margin: 0px 0px;
+  padding: 2px 2px;
   line-height: 22px;
   border-radius: 4px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+}
+
+.rule-entry {
+  margin: 2px 0px;
+  padding: 2px 4px;
+  line-height: 22px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  height: 22px;
 }
 
 .rule-list .editor-wrap {
@@ -25,9 +35,10 @@
 
 .rule-list .addrule {
   margin: 6px 5px 0px 0px;
+  white-space: nowrap;
 }
 
-.rule-list .addgroup {
+.rule-list .remove-group-cell {
   margin: 14px 5px 0px 0px;
 }
 
@@ -38,6 +49,33 @@
 .rule-entry option {
   height: 22px;
   padding: 0 5px;
+}
+
+.rule-result {
+  width: 15px;
+  text-align: center;
+  vertical-align: middle;
+  margin: 4px 7px 0 8px;
+  line-height: 22px;
+  font-size: 17px;
+}
+
+.check-mark {
+  width: 15px;
+  text-align: center;
+  vertical-align: middle;
+  margin: 1px 8px 0 0px;
+  font-size: 20px;
+}
+
+.check-mark .pass, .rule-result .pass {
+  font-family: "Segoe UI Symbol";
+  color: green;
+}
+
+.check-mark .fail, .rule-result .fail {
+  font-family: "Segoe UI Symbol";
+  color: darkred;
 }
 
 .rule-entry .auto-selection {
@@ -92,5 +130,12 @@
 .facts-status {
   padding: 2px; 
   border: 1px solid #333;
+}
+
+button.add-group, button.remove-group {
+  font-family: "Segoe UI Symbol";
+  vertical-align: middle;
+  line-height: 19px;
+  margin: 0px 2px;
 }
 
