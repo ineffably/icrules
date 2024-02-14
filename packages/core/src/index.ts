@@ -2,7 +2,7 @@ export type Subject = string;
 export type Term = any;
 export type Rule = [Subject, Operator, Term];
 export type Quantifiers = 'all' | 'any';
-export type Operator = 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'has' | 'nhas' | 'in' | 'nin';
+export type Operator = 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'has' | 'nhas' | 'in' | 'nit';
 export type Rules = (Rule | RuleGroup)[];
 export type RuleGroup = { all?: Rules, any?: Rules };
 export type Facts = Record<string, any>;
@@ -16,10 +16,10 @@ export type PluginArgs = {
 export interface ProcessArgs extends PluginArgs { plugins: Plugin[] }
 export interface ProcessResult extends Facts { pass: boolean }
 export const operators = [
-  'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'has', 'nhas', 'in', 'nin'
+  'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'has', 'nhas', 'in', 'nit'
 ] as Operator[];
 
-export function isGroup(testRule: Rule | RuleGroup): boolean {
+export function isGroup(testRule: Rule | RuleGroup = {}): boolean {
   const { all, any } = testRule as RuleGroup;
   if (all || any) return true;
   return false;
@@ -31,9 +31,12 @@ export const processResult = ({ pass, facts, rule, group, plugins = [] as Plugin
   plugins.reduce((pluginResult, plugin) => ({ ...pluginResult, ...(plugin({ pass, facts, rule, group }) || {}) }), { pass })
 )
 
-export function processRule(facts = {} as Facts, rule: Rule | RuleGroup, plugins = [] as Plugin[]): ProcessResult {
+export function processRuleOrGroup(facts: Facts = {}, rule: Rule | RuleGroup, plugins: Plugin[] = []): ProcessResult {
   if (isGroup(rule)) return processGroup(facts, rule as RuleGroup, plugins);
   const [field, op, term] = rule as Rule;
+  if (field === null || field === undefined || !op) {
+    throw new Error(`Invalid Rule\n${JSON.stringify(rule, null, 2)}`);
+  }
   const ruleResult = { pass: false } as PluginArgs;
   const value = facts && facts[field];
   const valueType = typeof value;
@@ -41,19 +44,19 @@ export function processRule(facts = {} as Facts, rule: Rule | RuleGroup, plugins
     value,
     type: valueType
   }
-  
+
   // if fields contain dot refs, let's see if there's an object to query
   if (field.indexOf('.') > 0) {
     const queryFields = field.split('.');
     const queryValue = queryFields && facts[queryFields[0]];
     const objType = typeof queryValue;
     const objectValue = (objType === 'object' && queryValue);
-    if(objectValue){
+    if (objectValue) {
       factQuery.value = queryFields.slice(1).reduce((result, field) => (result[field]), objectValue);
       factQuery.type = typeof value;
     }
   }
-  
+
   const isNumeric = factQuery.type === 'bigint' || factQuery.type === 'number';
   const termValue = isNumeric ? parseInt(term, 10) : term;
   const factValue = factQuery.value;
@@ -64,7 +67,7 @@ export function processRule(facts = {} as Facts, rule: Rule | RuleGroup, plugins
     ruleResult.pass = (op === 'nhas') ? !pass : pass;
   }
 
-  if (op === 'in' || op === 'nin') {
+  if (op === 'in' || op === 'nit') {
     const isArray = term && Array.isArray(term);
     const valueType = typeof term;
     if (isArray || ['string', 'object'].includes(valueType)) {
@@ -84,9 +87,9 @@ export function processRule(facts = {} as Facts, rule: Rule | RuleGroup, plugins
   } as ProcessArgs);
 }
 
-export function processGroup(facts = {} as Facts, ruleGroup: RuleGroup, plugins = [] as Plugin[]): ProcessResult {
+export function processGroup(facts: Facts = {}, ruleGroup: RuleGroup = {}, plugins: Plugin[] = []): ProcessResult {
   const { all, any } = ruleGroup;
-  const action = rule => processRule(facts, rule, plugins);
+  const action = rule => processRuleOrGroup(facts, rule, plugins);
 
   if (all) {
     const groupResult = all.map(action);
@@ -100,35 +103,15 @@ export function processGroup(facts = {} as Facts, ruleGroup: RuleGroup, plugins 
     return processResult({ pass, rule: ruleGroup, facts, plugins, group: { any: groupResult, pass } });
   }
 
-  console.error('Invalid RuleGroup interpreting', JSON.stringify(ruleGroup, null, 2));
+  throw new Error(`Invalid RuleGroup\n${JSON.stringify(ruleGroup, null, 2)}`,);
 
   return {
     pass: false
   };
 }
 
-export const processVerbose = (facts = null as Facts, ruleGroup: RuleGroup, plugins = [] as Plugin[]) => (
+export const processVerbose = (facts: Facts = {}, ruleGroup: RuleGroup, plugins: Plugin[] = []) => (
   processGroup(facts, ruleGroup, [verbosePlugin, ...plugins])
 );
 
-export class ICRules {
-  facts: Facts;
-
-  constructor(facts = {} as Facts) {
-    if (facts) {
-      this.facts = facts;
-    }
-  }
-
-  setFacts = (facts = {} as Facts) => {
-    this.facts = facts;
-  }
-
-  exec = (ruleGroup: RuleGroup, plugins = [] as Plugin[]) => processGroup(this.facts, ruleGroup, plugins);
-
-  static process = processGroup;
-
-  static processVerbose = processVerbose;
-}
-
-export default ICRules;
+export const processRules = processGroup;

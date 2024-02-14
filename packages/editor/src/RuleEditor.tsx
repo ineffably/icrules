@@ -1,21 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ICRulesEditorProps, RuleEditorProps, RuleGroupEditorProps } from '.';
-import ICRules, { Operator, operators, processRule, processVerbose, Quantifiers, Rule, RuleGroup } from '@icrules/core';
-import { FactsEditor } from './FactsEditor';
+import { FactsEditorProps, ICRulesEditorProps, RuleEditorProps, RuleGroupEditorProps, opMap, safeParse } from '.';
+import { Operator, operators, processRuleOrGroup, processVerbose, Quantifiers, Rule, RuleGroup } from '@icrules/core';
 import './editorStyle.css';
-
-export const opMap = {
-  eq: 'equals',
-  neq: 'not equals',
-  gt: '> greater than',
-  lt: '< less than',
-  lte: '<= less or equal',
-  gte: '>= greater or equal',
-  has: 'contains',
-  nhas: 'not contains',
-  in: 'in term',
-  nin: 'not in term'
-};
 
 let lastId = null;
 
@@ -40,7 +26,7 @@ const RuleEditor = ({
   const valueId = `value-${key}`
   const termId = `term-${key}`
 
-  const result = processRule(facts, liveRule)
+  const result = processRuleOrGroup(facts, liveRule)
 
   return (
     <div key={key} className='rule-editor'>
@@ -148,7 +134,7 @@ const RuleGroupEditor = ({
     setLiveRules({ [quantifier]: [...ruleList] });
   }, [quantifier])
 
-  const isValidRule = processRule(facts, liveRules);
+  const isValidRule = processRuleOrGroup(facts, liveRules);
   const verboseResults = processVerbose(facts, liveRules);
   console.log('==> verboseResults', JSON.stringify(verboseResults, null, 2));
   return (
@@ -228,6 +214,28 @@ export const ICRulesEditor = ({
 
   return (
     <RuleGroupEditor {...{ rules: liveRules, facts, onChange: onRuleChange, showFactsEditor }} />
+  )
+}
+
+export const FactsEditor = ({ object, onChange = () => null }: FactsEditorProps) => {
+  const [activeObject, setActiveObject] = useState(JSON.stringify(object, null, 2));
+  const parsedValue = safeParse(activeObject);
+
+  return (
+    <div>
+      <div className='facts-status' style={{ color: parsedValue ? 'green' : 'darkred' }}>
+        Facts are {parsedValue ? 'valid' : 'invalid'}
+      </div>
+      <textarea
+        title='enter your facts here'
+        onChange={ev => {
+          setActiveObject(ev.target.value);
+          onChange(ev.target.value, parsedValue !== false)
+        }}
+        style={{ width: '300px', height: '300px' }}
+        value={activeObject}>
+      </textarea>
+    </div>
   )
 }
 

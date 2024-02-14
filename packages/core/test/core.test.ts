@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Facts } from '../lib';
-import ICRulesDefault, { ICRules, verbosePlugin } from '../src';
+import { RuleGroup, verbosePlugin, processRules, processVerbose } from '../src';
 
 describe('icrules verification', () => {
-  const { process, processVerbose } = ICRules;
   const facts = {
     sky: 'blue',
     count: 32,
@@ -27,53 +27,37 @@ describe('icrules verification', () => {
 
   describe('basic operation and instance validation', () => {
     it('should process a single rule group using basic eq tests', () => {
-      expect(process(facts, { all: [['sky', 'eq', 'blue']] }).pass).toBe(true);
-      expect(process(facts, { all: [['sky', 'eq', 'green']] }).pass).toBe(false);
-      expect(process(facts, { any: [['sky', 'eq', 'blue']] }).pass).toBe(true);
-      expect(process(facts, { any: [['sky', 'eq', 'green']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['sky', 'eq', 'blue']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'eq', 'green']] }).pass).toBe(false);
+      expect(processRules(facts, { any: [['sky', 'eq', 'blue']] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['sky', 'eq', 'green']] }).pass).toBe(false);
     });
 
     it('should fail if the rule group is invalid', () => {
-      expect(process(facts, [['sky', 'eq', 'blue']] as any).pass).toBe(false);
-      expect(process(facts, { some: [['sky', 'eq', 'blue']] } as any).pass).toBe(false);
+      expect(() => processRules(facts, { some: [['sky', 'eq', 'blue']] } as any)).toThrow();
+      expect(() => processRules(facts, [['sky', 'eq', 'blue']] as any)).toThrow();
+      expect(() => processRules(facts, {all: [['sky']]} as any)).toThrow();
+      expect(() => processRules(facts, {all: [['sky', 'eq']]} as any)).toBeDefined(); // term is undefined if excluded
     });
 
     it('should fail if the facts are invalid', () => {
-      expect(process(undefined, { all: [['sky', 'eq', 'blue']] } as any).pass).toBe(false);
-      expect(process(null, { all: [['sky', 'eq', 'blue']] } as any).pass).toBe(false);
+      expect(processRules(undefined, { all: [['sky', 'eq', 'blue']] } as any).pass).toBe(false);
+      // forcing null as a Facts type
+      expect(processRules(null as unknown as Facts, { all: [['sky', 'eq', 'blue']] } as any).pass).toBe(false);
     });
 
     it('should process all and any quantifiers against multiple rules in a single RuleGroup', () => {
-      expect(process(facts, { all: [['sky', 'eq', 'blue'], ['count', 'eq', 32]] }).pass).toBe(true);
-      expect(process(facts, { any: [['sky', 'eq', 'blue'], ['count', 'eq', 0]] }).pass).toBe(true);
-      expect(process(facts, { any: [['sky', 'eq', 'blue'], ['count', 'eq', 32]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'eq', 'blue'], ['count', 'eq', 32]] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['sky', 'eq', 'blue'], ['count', 'eq', 0]] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['sky', 'eq', 'blue'], ['count', 'eq', 32]] }).pass).toBe(true);
 
-      expect(process(facts, { all: [['sky', 'eq', 'blue'], ['count', 'eq', 0]] }).pass).toBe(false);
-      expect(process(facts, { any: [['sky', 'eq', 'green'], ['count', 'eq', 0]] }).pass).toBe(false);
-      expect(process(facts, { any: [['sky', 'neq', 'green'], ['count', 'eq', 0]] }).pass).toBe(true);
-    })
-
-    it('should also process as expected as an instance', () => {
-      const withInstance = (icRuleInstance: ICRules) => {
-        expect(icRuleInstance.exec({ all: [['sky', 'eq', 'blue']] }).pass).toBe(true);
-        expect(icRuleInstance.exec({ all: [['sky', 'eq', 'green']] }).pass).toBe(false);
-        expect(icRuleInstance.exec({ all: [['sky', 'neq', 'green']] }).pass).toBe(true);
-
-        // use other facts
-        icRuleInstance.setFacts({ ocean: 'green' })
-        expect(icRuleInstance.exec({ all: [['ocean', 'eq', 'green']] }).pass).toBe(true);
-
-        // should allow the user to update facts
-        icRuleInstance.setFacts({ sky: 'black' })
-        expect(icRuleInstance.exec({ all: [['sky', 'eq', 'black']] }).pass).toBe(true);
-        expect(icRuleInstance.exec({ all: [['sky', 'eq', 'blue']] }).pass).toBe(false);
-      }
-      withInstance(new ICRules(facts));
-      withInstance(new ICRulesDefault(facts));
+      expect(processRules(facts, { all: [['sky', 'eq', 'blue'], ['count', 'eq', 0]] }).pass).toBe(false);
+      expect(processRules(facts, { any: [['sky', 'eq', 'green'], ['count', 'eq', 0]] }).pass).toBe(false);
+      expect(processRules(facts, { any: [['sky', 'neq', 'green'], ['count', 'eq', 0]] }).pass).toBe(true);
     })
 
     it('should process nested RuleGroups', () => {
-      expect(process(facts, {
+      expect(processRules(facts, {
         all: [['sky', 'neq', 'green'], {
           all: [['sky', 'eq', 'blue'], ['count', 'eq', 32]]
         }]
@@ -83,88 +67,88 @@ describe('icrules verification', () => {
 
   describe('should utilize eq and neq operators', () => {
     it('should infer the term type based on the fact type', () => {
-      expect(process(facts, { all: [['count', 'eq', '32']] }).pass).toBe(true);
-      expect(process(facts, { all: [['count', 'eq', 32]] }).pass).toBe(true);
-      expect(process(facts, { all: [['id', 'eq', 123456]] }).pass).toBe(false);
-      expect(process(facts, { all: [['id', 'eq', '123456']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'eq', '32']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'eq', 32]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['id', 'eq', 123456]] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['id', 'eq', '123456']] }).pass).toBe(true);
     })
   })
 
   describe('should utilize eq and neq operators', () => {
     it('should process eq and neq rules against facts with expected results', () => {
-      expect(process(facts, { all: [['sky', 'eq', 'blue']] }).pass).toBe(true);
-      expect(process(facts, { all: [['sky', 'neq', 'blue']] }).pass).toBe(false);
-      expect(process(facts, { all: [['sky', 'eq', 'green']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['sky', 'eq', 'blue']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'neq', 'blue']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['sky', 'eq', 'green']] }).pass).toBe(false);
 
-      expect(process(facts, { all: [['sky', 'eq', 0]] }).pass).toBe(false);
-      expect(process(facts, { all: [['count', 'neq', 0]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'eq', 0]] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['count', 'neq', 0]] }).pass).toBe(true);
 
       // with eq types are compared with inferred values
-      expect(process(facts, { all: [['count', 'neq', '0']] }).pass).toBe(true);
-      expect(process(facts, { all: [['count', 'eq', '32']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'neq', '0']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'eq', '32']] }).pass).toBe(true);
 
       // let's try with hydrating serialized facts...
-      expect(process(hydratedFacts, { all: [['count', 'neq', 0]] }).pass).toBe(true);
-      expect(process(hydratedFacts, { all: [['count', 'neq', '0']] }).pass).toBe(true);
-      expect(process(hydratedFacts, { all: [['count', 'eq', '32']] }).pass).toBe(true);
+      expect(processRules(hydratedFacts, { all: [['count', 'neq', 0]] }).pass).toBe(true);
+      expect(processRules(hydratedFacts, { all: [['count', 'neq', '0']] }).pass).toBe(true);
+      expect(processRules(hydratedFacts, { all: [['count', 'eq', '32']] }).pass).toBe(true);
     })
   });
 
   describe('should utilize gt,lt,lte and gte operators', () => {
     it('should process gt/lt gte/lte against strings', () => {
-      expect(process(facts, { all: [['sky', 'gt', 'green']] }).pass).toBe(false);
-      expect(process(facts, { all: [['sky', 'lt', 'green']] }).pass).toBe(true);
-      expect(process(facts, { all: [['sky', 'lt', 'blue']] }).pass).toBe(false);
-      expect(process(facts, { all: [['sky', 'gt', 'blue']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['sky', 'gt', 'green']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['sky', 'lt', 'green']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'lt', 'blue']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['sky', 'gt', 'blue']] }).pass).toBe(false);
 
-      expect(process(facts, { all: [['sky', 'gte', 'blue']] }).pass).toBe(true);
-      expect(process(facts, { all: [['sky', 'lte', 'blue']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'gte', 'blue']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'lte', 'blue']] }).pass).toBe(true);
     })
 
     it('should process gt, lt, gte and lte against numeric values', () => {
-      expect(process(facts, { all: [['count', 'gt', 32]] }).pass).toBe(false);
-      expect(process(facts, { all: [['count', 'lt', 32]] }).pass).toBe(false);
-      expect(process(facts, { all: [['count', 'gt', 3]] }).pass).toBe(true);
-      expect(process(facts, { all: [['count', 'lt', 322]] }).pass).toBe(true);
-      expect(process(facts, { all: [['count', 'lte', 32]] }).pass).toBe(true);
-      expect(process(facts, { all: [['count', 'gte', 32]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'gt', 32]] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['count', 'lt', 32]] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['count', 'gt', 3]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'lt', 322]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'lte', 32]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'gte', 32]] }).pass).toBe(true);
 
       // gt and ls are soft equivalents, numbers are compared against strings
-      expect(process(facts, { all: [['count', 'gt', '32']] }).pass).toBe(false);
-      expect(process(facts, { all: [['count', 'lt', '32']] }).pass).toBe(false);
-      expect(process(facts, { all: [['count', 'lte', '32']] }).pass).toBe(true);
-      expect(process(facts, { all: [['count', 'gte', '32']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'gt', '32']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['count', 'lt', '32']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['count', 'lte', '32']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['count', 'gte', '32']] }).pass).toBe(true);
     })
   })
 
-  describe('should process has, nhas, in and nin with expected results', () => {
+  describe('should process has, nhas, in and nit with expected results', () => {
     it('should process has/nhas against strings and collections', () => {
       // has allthethings
-      expect(process(facts, { all: [['sky', 'has', 'lu']] }).pass).toBe(true);
-      expect(process(facts, { all: [['months', 'has', 12]] }).pass).toBe(false);
-      expect(process(facts, { all: [['months', 'has', 5]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'has', 'lu']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['months', 'has', 12]] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['months', 'has', 5]] }).pass).toBe(true);
 
-      expect(process(facts, { all: [['markets', 'has', 'en-CA']] }).pass).toBe(true);
-      expect(process(facts, { all: [['markets', 'has', 'fr-CA']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['markets', 'has', 'en-CA']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['markets', 'has', 'fr-CA']] }).pass).toBe(false);
 
       // nhas allthethings
-      expect(process(facts, { all: [['sky', 'nhas', 'lu']] }).pass).toBe(false);
-      expect(process(facts, { all: [['months', 'nhas', 12]] }).pass).toBe(true);
-      expect(process(facts, { all: [['months', 'nhas', 5]] }).pass).toBe(false);
-      expect(process(facts, { all: [['markets', 'nhas', 'en-CA']] }).pass).toBe(false);
-      expect(process(facts, { all: [['markets', 'nhas', 'fr-CA']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'nhas', 'lu']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['months', 'nhas', 12]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['months', 'nhas', 5]] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['markets', 'nhas', 'en-CA']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['markets', 'nhas', 'fr-CA']] }).pass).toBe(true);
 
       // mixed types always fail
-      expect(process(facts, { all: [['count', 'has', 'lu']] }).pass).toBe(false);
-      expect(process(facts, { all: [['count', 'nhas', 'lu']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['count', 'has', 'lu']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['count', 'nhas', 'lu']] }).pass).toBe(false);
     })
 
     it('should process fact value against rule value', () => {
-      expect(process(facts, { all: [['sky', 'in', ['blue', 'black']]] }).pass).toBe(true);
-      expect(process(facts, { all: [['sky', 'in', ['cyan', 'black']]] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['sky', 'in', ['blue', 'black']]] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'in', ['cyan', 'black']]] }).pass).toBe(false);
 
-      expect(process(facts, { all: [['sky', 'in', 'bluegreenred']] }).pass).toBe(true);
-      expect(process(facts, { all: [['sky', 'in', 'green']] }).pass).toBe(false);
+      expect(processRules(facts, { all: [['sky', 'in', 'bluegreenred']] }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'in', 'green']] }).pass).toBe(false);
     })
   })
 
@@ -179,12 +163,36 @@ describe('icrules verification', () => {
     });
 
     it('should see verbose results using the internal verbosePlugin through process', () => {
-      const processResult = process(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [verbosePlugin]);
+      const processResult = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [verbosePlugin]);
       expect(processResult.pass).toBe(false);
       expect(processResult.group.pass).toBe(false);
       expect(processResult.group.all[0].pass).toBe(true);
       expect(processResult.group.all[1].pass).toBe(false);
     });
+
+    it('should be able to use the verbose plugin manually', () => {
+      const facts1 = {
+        language: 'en',
+        signedin: false,
+        guestid: true
+      }
+      
+      const rule1 = {
+        all: [
+          ['language', 'eq', 'en'],
+          { 
+            any: [
+              ['signedin', 'eq', true], 
+              ['guestid', 'eq', true]
+            ]
+          }
+        ] 
+      } as RuleGroup
+
+      const results = processRules(facts1, rule1, [verbosePlugin]);
+      expect(results.pass).toBe(true);
+    });
+
 
     it('should process a custom plugin', () => {
       const ruleCounts = {
@@ -198,7 +206,7 @@ describe('icrules verification', () => {
           return ({ pass, count: ruleCounts.count, groupCount: ruleCounts.groupCount })
         }
       }
-      const processResult = process(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [ruleCounts.plugin]);
+      const processResult = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [ruleCounts.plugin]);
       expect(processResult.pass).toBe(false);
       expect(processResult.count).toBe(3);
       expect(processResult.groupCount).toBe(1);
@@ -206,7 +214,7 @@ describe('icrules verification', () => {
 
     it('should allow the plugin to change the outcome', () => {
       const alwaysTrue = () => ({ pass: true })
-      const trueResults = process(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [alwaysTrue]);
+      const trueResults = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [alwaysTrue]);
       expect(trueResults.pass).toBe(true);
       expect(Object.keys(trueResults).length).toBe(1);
       expect(Object.keys(trueResults)[0]).toBe('pass');
@@ -214,7 +222,7 @@ describe('icrules verification', () => {
 
     it('should allow a plugin that just changest the group outcome', () => {
       const alwaysTrue = ({ group, pass }) => ({ pass: group ? true : pass });
-      const trueResults = process(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [alwaysTrue]);
+      const trueResults = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [alwaysTrue]);
       expect(trueResults.pass).toBe(true);
       expect(Object.keys(trueResults).length).toBe(1);
       expect(Object.keys(trueResults)[0]).toBe('pass');
@@ -226,22 +234,22 @@ describe('icrules verification', () => {
       const justEmptyObject = () => ({} as any)
       const justNumber = () => (1 as any)
 
-      const nullPlugin = process(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justNull]);
+      const nullPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justNull]);
       expect(nullPlugin.pass).toBe(false);
       expect(Object.keys(nullPlugin).length).toBe(1);
       expect(Object.keys(nullPlugin)[0]).toBe('pass');
 
-      const undefinedPlugin = process(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justUndefined]);
+      const undefinedPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justUndefined]);
       expect(undefinedPlugin.pass).toBe(false);
       expect(Object.keys(undefinedPlugin).length).toBe(1);
       expect(Object.keys(undefinedPlugin)[0]).toBe('pass');
 
-      const emptyObjectPlugin = process(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justEmptyObject]);
+      const emptyObjectPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justEmptyObject]);
       expect(emptyObjectPlugin.pass).toBe(false);
       expect(Object.keys(emptyObjectPlugin).length).toBe(1);
       expect(Object.keys(emptyObjectPlugin)[0]).toBe('pass');
 
-      const numberPlugin = process(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justNumber]);
+      const numberPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justNumber]);
       expect(numberPlugin.pass).toBe(false);
       expect(Object.keys(numberPlugin).length).toBe(1);
       expect(Object.keys(numberPlugin)[0]).toBe('pass');
@@ -251,21 +259,21 @@ describe('icrules verification', () => {
 
   describe('rules should query facts with objects', () => {
     it('should be able to query a fact with an object value and have a distinction between object and fields with dots', () => {
-      expect(process(facts, { any: [['selectedProfile.background.color', 'eq', 'blue']] }).pass).toBe(true);
-      expect(process(facts, { any: [['selectedProfile.products', 'lt', 25]] }).pass).toBe(true);
-      expect(process(facts, { any: [['selectedProfile.products', 'lt', '25']] }).pass).toBe(true);
-      expect(process(facts, { any: [['selectedProfile.products', 'gt', '15']] }).pass).toBe(true);
-      expect(process(facts, { any: [['selectedProfile.products', 'gt', 15]] }).pass).toBe(true);
-      expect(process(facts, { any: [['selectedProfile.products', 'lt', 15]] }).pass).toBe(false);
-      expect(process(facts, { any: [['selectedProfile.products', 'neq', 15]] }).pass).toBe(true);
-      expect(process(facts, { any: [['selectedProfile.language', 'eq', 'en']] }).pass).toBe(false);
+      expect(processRules(facts, { any: [['selectedProfile.background.color', 'eq', 'blue']] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['selectedProfile.products', 'lt', 25]] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['selectedProfile.products', 'lt', '25']] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['selectedProfile.products', 'gt', '15']] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['selectedProfile.products', 'gt', 15]] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['selectedProfile.products', 'lt', 15]] }).pass).toBe(false);
+      expect(processRules(facts, { any: [['selectedProfile.products', 'neq', 15]] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['selectedProfile.language', 'eq', 'en']] }).pass).toBe(false);
       
       // non-existent should still not pass
-      expect(process(facts, { any: [['blahblah.nothinghere', 'lt', 25]] }).pass).toBe(false);
+      expect(processRules(facts, { any: [['blahblah.nothinghere', 'lt', 25]] }).pass).toBe(false);
       
       // should distinguish between fields with dots and objects
-      expect(process(facts, { any: [['name.last', 'eq', 'Smith']] }).pass).toBe(true);
-      expect(process(facts, { any: [['name.last', 'eq', 'Wilson']] }).pass).toBe(false);
+      expect(processRules(facts, { any: [['name.last', 'eq', 'Smith']] }).pass).toBe(true);
+      expect(processRules(facts, { any: [['name.last', 'eq', 'Wilson']] }).pass).toBe(false);
     })
   })
 });

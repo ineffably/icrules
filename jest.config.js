@@ -33,7 +33,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   testPathIgnorePatterns: [`/node_modules/`],
   moduleFileExtensions: ['ts', 'tsx', 'js'],
-  coverageReporters: ['json', 'lcov', 'html'],
+  coverageReporters: ['json', 'html', 'text'],
   transform: {
     '^.+\\.tsx|.ts?$': 'ts-jest'
   }

@@ -8,13 +8,13 @@
     "browser": true
   },
   "extends": [
-    "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
     "@typescript-eslint/no-empty-function": 1,
-    "quotes": [2, "single", { "avoidEscape": true }]
+    "quotes": [2, "single", { "avoidEscape": true }],
+    "@typescript-eslint/no-explicit-any": "off"
   },
   "ignorePatterns": [
     "jest.config.js",

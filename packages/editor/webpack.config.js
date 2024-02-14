@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const path = require('path');
 const outDir = 'lib';
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { BundleStatsWebpackPlugin } = require('bundle-stats-webpack-plugin');
 
 module.exports = {
   mode: 'production',
@@ -11,16 +13,15 @@ module.exports = {
     filename: `index.js`,
     library: { name: 'editor', type: 'umd' }
   },
-  devServer: {
-    port: 8880
-  },
   externals: {
     React: 'react',
     ReactDOM: 'react-dom',
     'react': 'React',
     'react-dom': 'ReactDOM',
     'react': 'react',
-    'react-dom': 'react-dom'
+    'react-dom': 'react-dom',
+    'antd': 'antd',
+    '@ant-design/icons': '@ant-design/icons'
   },
   module: {
     rules: [
@@ -37,5 +38,8 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
-  }
+  },
+  plugins: [
+    new BundleStatsWebpackPlugin()
+  ]
 }

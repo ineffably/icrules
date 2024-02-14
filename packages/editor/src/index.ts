@@ -1,8 +1,33 @@
+export { ICRulesEditorAntd } from './RuleEditorAntd';
 import { Rule, RuleGroup } from '@icrules/core';
 import { ICRulesEditor } from './RuleEditor';
 
-export { ICRulesEditor };
 export default ICRulesEditor;
+
+export const safeParse = (textJson: string, showError = false): any | boolean => {
+  try {
+    return JSON.parse(textJson);
+  }
+  catch (e) {
+    if (showError) {
+      console.error(e);
+    }
+    return false;
+  }
+}
+
+export const opMap = {
+  eq: 'equals',
+  neq: 'not equals',
+  gt: '> greater than',
+  lt: '< less than',
+  lte: '<= less or equal',
+  gte: '>= greater or equal',
+  has: 'contains',
+  nhas: 'not contains',
+  in: 'in term',
+  nit: 'not in term'
+};
 
 export interface RuleEditorProps {
   facts?: any;
@@ -20,6 +45,7 @@ export interface RuleGroupEditorProps {
   depth?: number;
   index?: number;
   showFactsEditor?: boolean;
+  extra?: any;
 }
 
 export interface RulesEditorOptions {

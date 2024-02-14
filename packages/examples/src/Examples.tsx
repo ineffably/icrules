@@ -1,8 +1,9 @@
-import RuleEditor from '@icrules/editor';
+import { ICRulesEditorAntd } from '@icrules/editor';
 import { useState } from 'react';
 import { RuleGroup, processVerbose } from '@icrules/core';
 import { syntaxHighlight } from './utils';
 import './examples.css';
+import { Card } from 'antd';
 
 export const Examples = () => {
   const rules = {
@@ -27,17 +28,16 @@ export const Examples = () => {
   }
   const { pass, group } = processVerbose(facts, liveRules);
   return (
-    <div>
-      <div><b>ICRules Editor Example</b></div>
+    <Card title={<b>ICRules Antd Editor Example</b>} size='small'>
       <div style={{ display: 'flex', flexDirection: 'row', width: '98vw' }}>
-        <RuleEditor {...{ facts, rules: liveRules, onChange }} />
-        <div style={{ width: '300px' }}>
+        <ICRulesEditorAntd {...{ facts, rules: liveRules, onChange }} />
+        <Card style={{ margin: '0 4px' }} title={'JSON rules'}  size='default' hoverable={true} styles={{body: {padding: 0}}} >
           <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(liveRules, null, 2)) }}></pre>
-        </div>
-        <div style={{ width: '300px' }}>
+        </Card>
+        <Card style={{ margin: '0 4px', padding: 0 }} title='Verbose JSON rules and result'  size='default' hoverable={true} styles={{body: {padding: 0}}}>
           <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify({ pass, group }, null, 2)) }}></pre>
-        </div>
+        </Card>
       </div>
-    </div>
+    </Card>
   )
 }
