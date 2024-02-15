@@ -1,11 +1,10 @@
 import { type Operator, type RuleGroup, operators, processRuleOrGroup, Quantifiers, Rule, processVerbose } from '@icrules/core';
 import { useEffect, useState } from 'react';
 import { opMap, type ICRulesEditorProps, type RuleEditorProps, type RuleGroupEditorProps, FactsEditorProps, safeParse } from '.';
-import { Alert, Button, Card, Input, Select, Space, Tag, Tooltip } from 'antd';
+import { AutoComplete, Button, Card, Input, Select, Space, Tag, Tooltip } from 'antd';
 import { SizeType } from 'antd/es/config-provider/SizeContext';
 import { CheckCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import './editorStyle.css';
-import TextArea from 'antd/es/input/TextArea';
 
 let lastId = null;
 
@@ -20,7 +19,7 @@ export const FactsEditorAntd = ({ object, onChange = () => null }: FactsEditorPr
       title={
         <span style={{ color: parsedValue ? 'green' : 'darkred' }}>Facts are {parsedValue ? 'valid' : 'invalid'}. </span>
       }>
-      <TextArea
+      <Input.TextArea
         rows={25}
         title='enter your facts here'
         onChange={ev => {
@@ -61,6 +60,7 @@ export const RuleEditorAntd = ({
         <Tag icon={<CheckCircleOutlined />} color={result.pass ? 'green' : 'red'} />
       </Tooltip>
       <div key={'rule-fact'} >
+        <AutoComplete  />
         <Input
           size={userSize}
           id={termId}

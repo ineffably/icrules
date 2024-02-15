@@ -5,6 +5,7 @@ module.exports = {
       targets: {node: 'current'},
       useBuiltIns: 'entry'
     }],
+    ['@babel/preset-react', {runtime: 'automatic'}],
     '@babel/preset-typescript',
   ],
 };

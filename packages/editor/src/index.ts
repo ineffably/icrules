@@ -3,6 +3,21 @@ import { Rule, RuleGroup } from '@icrules/core';
 import { ICRulesEditor } from './RuleEditor';
 
 export default ICRulesEditor;
+export { 
+  ICRulesEditor
+}
+
+export const flattenKeys = (obj: any, prefix = ''): any => {
+  let result = {};
+  for (const key in obj) {
+    if (typeof obj[key] === 'object') {
+      result = { ...result, ...flattenKeys(obj[key], `${prefix}${key}.`) };
+    } else {
+      result[`${prefix}${key}`] = obj[key];
+    }
+  }
+  return result;
+}
 
 export const safeParse = (textJson: string, showError = false): any | boolean => {
   try {

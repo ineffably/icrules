@@ -3,38 +3,52 @@ const path = require('path');
 const { lstatSync, readdirSync } = require('fs');
 const basePath = path.resolve(__dirname, 'packages');
 const packages = readdirSync(basePath).filter(name => (lstatSync(path.join(basePath, name)).isDirectory()));
+const esModules = ['antd', 'ngx-bootstrap'].join('|');
 
 module.exports = {
-  resolver: 'ts-jest-resolver',
   preset: 'ts-jest',
-  rootDir: './',
-  transformIgnorePatterns: [
-    "node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)"
-  ],
-  coverageDirectory: '<rootDir>/coverage',
-  collectCoverageFrom: [
-    '<rootDir>/packages/core/src/**/*.ts',
-    '<rootDir>/packages/editor/src/**/*.ts',
-  ],
+  testEnvironment: 'jsdom',
   testMatch: [
     '<rootDir>/packages/core/test/**/*.test.ts',
-    '<rootDir>/packages/editor/test/**/*.test.ts'
+    '<rootDir>/packages/editor/test/**/*.test.ts*'
+  ],
+  transformIgnorePatterns: [
+    '<rootDir>/packages/editor/node_modules/',
+    '<rootDir>/packages/core/node_modules/',
   ],
   moduleNameMapper: {
-    ...packages.reduce(
-       (acc, name) => ({
-          ...acc,
-          [`@ahoopen/${name}(.*)$`]:
-          `<rootDir>/packages/./${name}/src/$1`,
-     }),
-   {},
-  ),
- },
-  testEnvironment: 'jsdom',
-  testPathIgnorePatterns: [`/node_modules/`],
-  moduleFileExtensions: ['ts', 'tsx', 'js'],
+    '\\.(css|less)$': '<rootDir>/css-stub.js'
+  },
+
+  // projects: [
+  //   {
+  //     displayName: 'core',
+  //     testMatch: [
+  //       '<rootDir>/packages/core/test/**/*.test.ts'
+  //     ],
+  //   },
+  //   {
+  //     displayName: 'editor',
+  //     testMatch: [
+  //       '<rootDir>/packages/editor/test/**/*.test.ts*'
+  //     ],
+  //     transformIgnorePatterns: [
+  //       '<rootDir>/packages/editor/node_modules/',
+  //       '<rootDir>/packages/core/node_modules/',
+  //     ],
+  //     moduleNameMapper: {
+  //       '\\.(css|less)$': '<rootDir>/css-stub.js'
+  //     },
+  //   }
+  // ],
+  verbose: true,
+  collectCoverageFrom: [
+    '<rootDir>/packages/editor/src/**/*.ts*',
+    '<rootDir>/packages/core/src/**/*.ts',
+  ],
+  transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
   coverageReporters: ['json', 'html', 'text'],
-  transform: {
-    '^.+\\.tsx|.ts?$': 'ts-jest'
-  }
+  // transform: {
+  //   '^.+\\.tsx|.ts?$': 'ts-jest'
+  // }
 };
