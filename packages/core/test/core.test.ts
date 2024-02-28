@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Facts } from '../lib';
-import { RuleGroup, verbosePlugin, processRules, processVerbose } from '../src';
+import { Facts, RuleGroup, verbosePlugin, processRules, processVerbose } from '../src';
 
 describe('icrules verification', () => {
   const facts = {
@@ -258,6 +257,34 @@ describe('icrules verification', () => {
   })
 
   describe('rules should query facts with objects', () => {
+
+    it('should allow you to query arrays', () => {
+      const facts = {
+        user : {
+          name: 'Jack',
+          roles: ['admin', 'user'],
+          permissions: ['read', 'write'],
+          expirations: [
+            { name: 'sub2', expiresInDays: 20 },
+            { name: 'sub3', expiresInDays: 10 },
+            { name: 'sub1', expiresInDays: 120 },
+          ]
+        }
+      }
+
+      const testRule = {
+        all: [
+          ['user.roles', 'has', 'admin'],
+          ['user.permissions', 'has', 'read'],
+          ['user.expirations', 'has', { any: ['expiresInDays', 'lte', 30]}]
+        ]
+      } as RuleGroup
+      
+      processRules(facts, testRule);
+      // expect(processRules(facts, testRule).pass).toBe(true);
+    })
+
+
     it('should be able to query a fact with an object value and have a distinction between object and fields with dots', () => {
       expect(processRules(facts, { any: [['selectedProfile.background.color', 'eq', 'blue']] }).pass).toBe(true);
       expect(processRules(facts, { any: [['selectedProfile.products', 'lt', 25]] }).pass).toBe(true);

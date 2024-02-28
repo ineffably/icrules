@@ -122,7 +122,6 @@ const RuleGroupEditor = ({
 
   useEffect(() => {
     const verboseResults = processVerbose(facts, liveRules);
-    console.log('==> verboseResults', verboseResults);
     onChange(liveRules, 0, index);
   }, [JSON.stringify(liveRules)])
 
@@ -135,8 +134,7 @@ const RuleGroupEditor = ({
   }, [quantifier])
 
   const isValidRule = processRuleOrGroup(facts, liveRules);
-  const verboseResults = processVerbose(facts, liveRules);
-  console.log('==> verboseResults', JSON.stringify(verboseResults, null, 2));
+  
   return (
     <div className="rule-group-editor" key={`group-edit-${index}-${depth}`}>
       {showFactsEditor && depth === 0 && index === 0 && <div>

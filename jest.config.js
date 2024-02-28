@@ -19,28 +19,6 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less)$': '<rootDir>/css-stub.js'
   },
-
-  // projects: [
-  //   {
-  //     displayName: 'core',
-  //     testMatch: [
-  //       '<rootDir>/packages/core/test/**/*.test.ts'
-  //     ],
-  //   },
-  //   {
-  //     displayName: 'editor',
-  //     testMatch: [
-  //       '<rootDir>/packages/editor/test/**/*.test.ts*'
-  //     ],
-  //     transformIgnorePatterns: [
-  //       '<rootDir>/packages/editor/node_modules/',
-  //       '<rootDir>/packages/core/node_modules/',
-  //     ],
-  //     moduleNameMapper: {
-  //       '\\.(css|less)$': '<rootDir>/css-stub.js'
-  //     },
-  //   }
-  // ],
   verbose: true,
   collectCoverageFrom: [
     '<rootDir>/packages/editor/src/**/*.ts*',

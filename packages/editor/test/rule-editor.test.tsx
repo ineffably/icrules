@@ -34,5 +34,20 @@ describe('@icrules/editor', () => {
       expect(flattenKeys(obj)).toEqual({ 'a.b.c': 1 })
     })
 
+    it('should flatten a more complex object', () => {
+      const obj = {
+        a: {
+          test: 123,
+          b: {
+            a: 1,
+            b: 2,
+            c: 3
+          }
+        }
+      }
+      console.log(flattenKeys(obj));
+      
+    })
+
   })
 })

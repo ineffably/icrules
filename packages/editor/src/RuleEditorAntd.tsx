@@ -1,23 +1,53 @@
-import { type Operator, type RuleGroup, operators, processRuleOrGroup, Quantifiers, Rule, processVerbose } from '@icrules/core';
+import { type Operator, type RuleGroup, operators, processRuleOrGroup, Quantifiers, Rule, processVerbose, flattenKeys } from '@icrules/core';
 import { useEffect, useState } from 'react';
 import { opMap, type ICRulesEditorProps, type RuleEditorProps, type RuleGroupEditorProps, FactsEditorProps, safeParse } from '.';
 import { AutoComplete, Button, Card, Input, Select, Space, Tag, Tooltip } from 'antd';
 import { SizeType } from 'antd/es/config-provider/SizeContext';
 import { CheckCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import styled from '@emotion/styled';
+
 import './editorStyle.css';
 
 let lastId = null;
+
+const FactsCard = styled(Card)`
+  width: 350px;
+  margin: 4px;
+`;
+
+const CardTitle = styled.span`
+  color: ${props => props.color};
+`;
+
+const SubjectAndTerms = styled(AutoComplete)`
+  width: 200px;
+`;
+
+const GroupEditorCard = styled(Card)`
+  margin-top: 4px;
+`;
+
+const GroupContainer = styled.div`
+  border: 2px dotted #ccc;
+  padding: 4px;
+`;
+
+const FlexRow = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
 
 export const FactsEditorAntd = ({ object, onChange = () => null }: FactsEditorProps) => {
   const [activeObject, setActiveObject] = useState(JSON.stringify(object, null, 2));
   const parsedValue = safeParse(activeObject);
 
   return (
-    <Card
-      style={{ width: '350px', margin: '4px' }}
+    <FactsCard
       hoverable={true}
       title={
-        <span style={{ color: parsedValue ? 'green' : 'darkred' }}>Facts are {parsedValue ? 'valid' : 'invalid'}. </span>
+        <CardTitle color={parsedValue ? 'green' : 'darkred'}>
+          Facts are {parsedValue ? 'valid' : 'invalid'}.
+        </CardTitle>
       }>
       <Input.TextArea
         rows={25}
@@ -28,7 +58,7 @@ export const FactsEditorAntd = ({ object, onChange = () => null }: FactsEditorPr
         }}
         value={activeObject}
       />
-    </Card>
+    </FactsCard>
   )
 }
 
@@ -40,7 +70,7 @@ export const RuleEditorAntd = ({
   depth = 0
 }: RuleEditorProps) => {
   const [userSize, setUserSize] = useState<SizeType>('middle');
-  const [factKeys] = useState(Object.keys(facts));
+  const [factKeys] = useState(Object.entries(flattenKeys(facts)));
   const [liveRule, setEditRule] = useState(rule);
   const [factKey, operator, term] = liveRule;
   const key = `${index}-${depth}`;
@@ -60,18 +90,15 @@ export const RuleEditorAntd = ({
         <Tag icon={<CheckCircleOutlined />} color={result.pass ? 'green' : 'red'} />
       </Tooltip>
       <div key={'rule-fact'} >
-        <AutoComplete  />
-        <Input
+        <SubjectAndTerms
           size={userSize}
           id={termId}
-          autoComplete='on'
           autoFocus={lastId === termId}
-          type='text'
-          list={listId}
+          options={factKeys.map(([key]) => ({ value: key }))}
           value={factKey}
-          onChange={ev => {
-            lastId = ev.target.id;
-            setEditRule([ev.target.value, operator, term]);
+          onChange={value => {
+            lastId = termId
+            setEditRule([value.toString(), operator, term]);
           }}
         />
       </div>
@@ -87,17 +114,17 @@ export const RuleEditorAntd = ({
         </Tooltip>
       </div>
       <div key={'rule-term'}>
-        <Input
+        <SubjectAndTerms
           size={userSize}
-          type='text'
           id={valueId}
-          value={term}
           autoFocus={lastId === valueId}
-          onChange={ev => {
-            lastId = ev.target.id;
-            setEditRule([factKey, operator, ev.target.value])
-          }
-          } />
+          options={factKeys.map(([, value]) => ({ value: value.toString() }))}
+          value={term}
+          onChange={value => {
+            lastId = valueId
+            setEditRule([factKey, operator, value])
+          }}
+        />
       </div>
     </Space>
   )
@@ -110,7 +137,8 @@ const RuleGroupEditorAntd = ({
   depth = 0,
   index = 0,
   showFactsEditor = true,
-  extra = () => null
+  extra = () => null,
+  FactsEditor = FactsEditorAntd
 }: RuleGroupEditorProps) => {
   const [userSize, setUserSize] = useState<SizeType>('middle');
   const [liveFacts, setLiveFacts] = useState(facts);
@@ -158,7 +186,6 @@ const RuleGroupEditorAntd = ({
 
   useEffect(() => {
     const verboseResults = processVerbose(facts, liveRules);
-    console.log('==> verboseResults', verboseResults);
     onChange(liveRules, 0, index);
   }, [JSON.stringify(liveRules)])
 
@@ -171,28 +198,26 @@ const RuleGroupEditorAntd = ({
   }, [quantifier])
 
   const isValidRule = processRuleOrGroup(facts, liveRules);
-  // const verboseResults = processVerbose(facts, liveRules);
-  // console.log('==> verboseResults', JSON.stringify(verboseResults, null, 2));
 
   return (
-    <div key={`group-edit-${index}-${depth}`} style={{ display: 'flex', flexDirection: 'row' }}>
+    <FlexRow key={`group-edit-${index}-${depth}`}>
       {showFactsEditor && depth === 0 && index === 0 &&
-        <FactsEditorAntd object={liveFacts} onChange={(value, isValid) => {
+        <FactsEditor object={liveFacts} onChange={(value, isValid) => {
           if (isValid) {
             setLiveFacts(value);
           }
         }} />
       }
-      <Card style={{ marginTop: '4px' }}
+      <GroupEditorCard
         hoverable={true}
         title={
           depth === 0 && index === 0 && <Space>
-            <span style={{ color: isValidRule ? 'green' : 'darkred' }}>Rule is {isValidRule ? 'valid' : 'invalid'}. </span>
-            <span style={{ color: isValidRule?.pass ? 'green' : 'darkred' }}>Rule is {isValidRule?.pass ? 'passing' : 'failing'}. </span>
+            <CardTitle color={isValidRule ? 'green' : 'darkred'}>Rule is {isValidRule ? 'valid' : 'invalid'}.</CardTitle>
+            <CardTitle color={isValidRule?.pass ? 'green' : 'darkred'}>Rule is {isValidRule?.pass ? 'passing' : 'failing'}.</CardTitle>
           </Space>
         }
       >
-        <div style={{ border: '2px dotted #ccc', padding: '4px' }}>
+        <GroupContainer>
           <div>
             <Select size={userSize} value={quantifier} options={quantfiers.map(q => ({ label: q, value: q }))} onChange={ev => setQuantifier(ev as Quantifiers)} style={{ width: '70px' }} />
             <Button size={userSize} icon={<PlusCircleOutlined />} title='add a group' onClick={() => addGroup()} />
@@ -200,7 +225,7 @@ const RuleGroupEditorAntd = ({
           </div>
           <div>
             {ruleList.map((ruleEntry, ruleIndex) => Array.isArray(ruleEntry) ?
-              (<div style={{ display: 'flex', flexDirection: 'row' }}>
+              (<FlexRow>
                 <RuleEditorAntd
                   onUpdate={onRuleUpdate}
                   key={`${JSON.stringify(ruleEntry)}-${ruleIndex}-${depth}`}
@@ -210,8 +235,8 @@ const RuleGroupEditorAntd = ({
                   <Button size={userSize} icon={<PlusCircleOutlined />} title='add a rule' onClick={() => onAddRule(ruleIndex + 1)} />
                   {ruleIndex > 0 && <Button size={userSize} icon={<MinusCircleOutlined />} title='remove rule' onClick={() => onDeleteRule(ruleIndex)} />}
                 </div>
-              </div>) :
-              (<div>
+              </FlexRow>) :
+              (
                 <RuleGroupEditorAntd
                   key={`${JSON.stringify(ruleEntry)}-${ruleIndex}-${depth}`}
                   extra={(ruleIndex > 0 ? () => <Button size={userSize} title='remove group' onClick={() => onDeleteRule(ruleIndex)} icon={<MinusCircleOutlined />} /> : null)}
@@ -227,12 +252,12 @@ const RuleGroupEditorAntd = ({
                   }}
                 />
 
-              </div>)
+              )
             )}
           </div>
-        </div>
-      </Card>
-    </div>
+        </GroupContainer>
+      </GroupEditorCard>
+    </FlexRow>
   )
 }
 
@@ -240,7 +265,10 @@ export const ICRulesEditorAntd = ({
   rules = {},
   facts = {},
   onChange = (r => null),
-  options = { showFactsEditor: true }
+  options = {
+    showFactsEditor: true,
+    factsEditor: FactsEditorAntd
+  }
 }: ICRulesEditorProps) => {
   const [liveRules, setLiveRules] = useState(rules);
   const { showFactsEditor } = options;
@@ -251,7 +279,7 @@ export const ICRulesEditorAntd = ({
   }
 
   return (
-    <RuleGroupEditorAntd {...{ rules: liveRules, facts, onChange: onRuleChange, showFactsEditor }} />
+    <RuleGroupEditorAntd {...{ rules: liveRules, facts, onChange: onRuleChange, showFactsEditor, FactsEditor: options.factsEditor }} />
   )
 }
 

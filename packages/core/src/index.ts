@@ -5,7 +5,7 @@ export type Quantifiers = 'all' | 'any';
 export type Operator = 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'has' | 'nhas' | 'in' | 'nit';
 export type Rules = (Rule | RuleGroup)[];
 export type RuleGroup = { all?: Rules, any?: Rules };
-export type Facts = Record<string, any>;
+export type Facts = Record<string, any> | Record<string, any>[];
 export type Plugin = (PluginArgs) => ProcessResult;
 export type PluginArgs = {
   pass: boolean;
@@ -14,10 +14,13 @@ export type PluginArgs = {
   group?: any;
 };
 export interface ProcessArgs extends PluginArgs { plugins: Plugin[] }
-export interface ProcessResult extends Facts { pass: boolean }
+export interface ProcessResult extends Record<string, any> { pass: boolean }
+export type ValueType = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function' | 'array';
 export const operators = [
   'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'has', 'nhas', 'in', 'nit'
 ] as Operator[];
+
+const defaultDelimiter = '.';
 
 export function isGroup(testRule: Rule | RuleGroup = {}): boolean {
   const { all, any } = testRule as RuleGroup;
@@ -39,22 +42,29 @@ export function processRuleOrGroup(facts: Facts = {}, rule: Rule | RuleGroup, pl
   }
   const ruleResult = { pass: false } as PluginArgs;
   const value = facts && facts[field];
-  const valueType = typeof value;
+  const valueType = typeof value as ValueType;
+  const termIsObject = typeof term == 'object';
+  const termIsRule = termIsObject && isGroup(term);
+  const termIsArray = Array.isArray(term);
   const factQuery = {
     value,
-    type: valueType
+    type: valueType,
+    queryFields: null
   }
 
   // if fields contain dot refs, let's see if there's an object to query
-  if (field.indexOf('.') > 0) {
-    const queryFields = field.split('.');
-    const queryValue = queryFields && facts[queryFields[0]];
+  if (field.indexOf(defaultDelimiter) > 0) {
+    const flatFacts = flattenKeys(facts);
+    const queryValue = flatFacts[field];
     const objType = typeof queryValue;
-    const objectValue = (objType === 'object' && queryValue);
-    if (objectValue) {
-      factQuery.value = queryFields.slice(1).reduce((result, field) => (result[field]), objectValue);
-      factQuery.type = typeof value;
+    if (queryValue) {
+      factQuery.value = queryValue;
+      factQuery.type = Array.isArray(queryValue) ? 'array' : objType;
     }
+  }
+
+  if (termIsRule) {
+    // TODO: implement nested rule processing against fact leaves
   }
 
   const isNumeric = factQuery.type === 'bigint' || factQuery.type === 'number';
@@ -68,9 +78,8 @@ export function processRuleOrGroup(facts: Facts = {}, rule: Rule | RuleGroup, pl
   }
 
   if (op === 'in' || op === 'nit') {
-    const isArray = term && Array.isArray(term);
     const valueType = typeof term;
-    if (isArray || ['string', 'object'].includes(valueType)) {
+    if (termIsArray || ['string', 'object'].includes(valueType)) {
       ruleResult.pass = term.includes(factValue);
     }
   }
@@ -85,6 +94,15 @@ export function processRuleOrGroup(facts: Facts = {}, rule: Rule | RuleGroup, pl
   return processResult({
     ...ruleResult, rule, facts, plugins
   } as ProcessArgs);
+}
+
+export function flattenKeys(obj: any, prefix = '', delimiter = '.'): any {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      return { ...acc, ...flattenKeys(value, `${prefix}${key}${delimiter}`) };
+    }
+    return { ...acc, [`${prefix}${key}`]: value };
+  }, {})
 }
 
 export function processGroup(facts: Facts = {}, ruleGroup: RuleGroup = {}, plugins: Plugin[] = []): ProcessResult {
@@ -104,10 +122,6 @@ export function processGroup(facts: Facts = {}, ruleGroup: RuleGroup = {}, plugi
   }
 
   throw new Error(`Invalid RuleGroup\n${JSON.stringify(ruleGroup, null, 2)}`,);
-
-  return {
-    pass: false
-  };
 }
 
 export const processVerbose = (facts: Facts = {}, ruleGroup: RuleGroup, plugins: Plugin[] = []) => (

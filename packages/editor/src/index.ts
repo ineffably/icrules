@@ -61,10 +61,12 @@ export interface RuleGroupEditorProps {
   index?: number;
   showFactsEditor?: boolean;
   extra?: any;
+  FactsEditor?: React.FC<FactsEditorProps>;
 }
 
 export interface RulesEditorOptions {
   showFactsEditor?: boolean;
+  factsEditor?: React.FC<FactsEditorProps>;
 }
 
 export interface FactsEditorProps {
