@@ -1,7 +1,7 @@
 {
   "name": "@icrules/core",
   "version": "0.1.0",
-  "description": "A small fast rules engine with a tiny JSON footprint with optional results insights for debugging",
+  "description": "A  small, fast and extensible rules engine with a compact JSON footprint",
   "main": "lib/index.js",
   "scripts": {
     "test": "jest --config ./../../jest.config.js ./test/core.test.ts --coverage",
