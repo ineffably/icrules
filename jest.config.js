@@ -16,9 +16,9 @@ module.exports = {
     '<rootDir>/packages/editor/node_modules/',
     '<rootDir>/packages/core/node_modules/',
   ],
-  moduleNameMapper: {
-    '\\.(css|less)$': '<rootDir>/css-stub.js'
-  },
+  // moduleNameMapper: {
+  //   '\\.(css|less)$': '<rootDir>/css-stub.js'
+  // },
   verbose: true,
   collectCoverageFrom: [
     '<rootDir>/packages/editor/src/**/*.ts*',
