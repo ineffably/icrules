@@ -1,6 +1,6 @@
 {
   "name": "icrules",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "test": "jest --config ./jest.config.js  --coverage",
     "build": "npm run build --workspaces --if-present",
@@ -18,10 +18,7 @@
     "rules editor",
     "integrated"
   ],
-  "author": {
-    "name": "Chad Neff",
-    "email": "chad@neffsaid.com"
-  },
+  "author": "Chad Neff <ccneff@gmail.com> (https://github.com/ineffably)",
   "license": "MIT",
   "description": "",
   "devDependencies": {

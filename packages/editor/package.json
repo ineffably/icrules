@@ -1,6 +1,6 @@
 {
   "name": "@icrules/editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -11,11 +11,11 @@
     "test": "jest --config ./../../jest.config.js ./test/rule-editor.test.tsx --coverage"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Chad Neff <ccneff@gmail.com> (https://github.com/ineffably)",
+  "license": "MIT",
   "dependencies": {
     "@emotion/styled": "^11.11.0",
-    "@icrules/core": "^0.1.0"
+    "@icrules/core": "^0.1.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",

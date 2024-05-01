@@ -1,6 +1,6 @@
 {
   "name": "@icrules/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A  small, fast and extensible rules engine with a compact JSON footprint",
   "main": "lib/index.js",
   "scripts": {
@@ -12,8 +12,8 @@
     "gendocs": "typedoc --out ../../docs ./src"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Chad Neff <ccneff@gmail.com> (https://github.com/ineffably)",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.2.5",
     "jest-environment-jsdom": "^29.5.0",

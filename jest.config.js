@@ -26,7 +26,4 @@ module.exports = {
   ],
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
   coverageReporters: ['json', 'html', 'text'],
-  // transform: {
-  //   '^.+\\.tsx|.ts?$': 'ts-jest'
-  // }
 };
