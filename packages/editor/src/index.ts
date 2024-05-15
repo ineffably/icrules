@@ -71,7 +71,7 @@ export interface RulesEditorOptions {
 
 export interface FactsEditorProps {
   object: any;
-  onChange?: (string, boolean)=>void;
+  onChange?: (string, any)=>void;
 }
 
 export interface ICRulesEditorProps {

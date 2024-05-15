@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Facts, RuleGroup, verbosePlugin, processRules, processVerbose } from '../src';
+import { Facts, RuleGroup, verbosePlugin, processRules, processVerbose, PluginArgs } from '../src';
 
 describe('icrules verification', () => {
   const facts = {
@@ -197,7 +197,7 @@ describe('icrules verification', () => {
       const ruleCounts = {
         count: 0,
         groupCount: 0,
-        plugin: ({ pass, group }) => {
+        plugin: ({ pass, group }: PluginArgs) => {
           ruleCounts.count++;
           if (group) {
             ruleCounts.groupCount++;
@@ -220,7 +220,7 @@ describe('icrules verification', () => {
     })
 
     it('should allow a plugin that just changest the group outcome', () => {
-      const alwaysTrue = ({ group, pass }) => ({ pass: group ? true : pass });
+      const alwaysTrue = ({ group, pass }: PluginArgs) => ({ pass: group ? true : pass });
       const trueResults = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [alwaysTrue]);
       expect(trueResults.pass).toBe(true);
       expect(Object.keys(trueResults).length).toBe(1);
