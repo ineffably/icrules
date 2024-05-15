@@ -45,8 +45,7 @@ describe('@icrules/editor', () => {
           }
         }
       }
-      console.log(flattenKeys(obj));
-      
+      expect(flattenKeys(obj)).toEqual({ 'a.test': 123, 'a.b.a': 1, 'a.b.b': 2, 'a.b.c': 3 })
     })
 
   })

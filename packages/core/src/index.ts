@@ -6,11 +6,11 @@ export type Operator = 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'has' | 'nha
 export type Rules = (Rule | RuleGroup)[];
 export type RuleGroup = { all?: Rules, any?: Rules };
 export type Facts = Record<string, any> | Record<string, any>[];
-export type Plugin = (PluginArgs) => ProcessResult;
+export type Plugin = (args: PluginArgs) => ProcessResult;
 export type PluginArgs = {
   pass: boolean;
-  facts?: Facts;
   rule: Rule | RuleGroup;
+  facts?: Facts;
   group?: any;
 };
 export interface ProcessArgs extends PluginArgs { plugins: Plugin[] }

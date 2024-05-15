@@ -5,7 +5,6 @@ import { AutoComplete, Button, Card, Input, Select, Space, Tag, Tooltip } from '
 import { SizeType } from 'antd/es/config-provider/SizeContext';
 import { CheckCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
-
 import './editorStyle.css';
 
 let lastId = null;
@@ -54,7 +53,7 @@ export const FactsEditorAntd = ({ object, onChange = () => null }: FactsEditorPr
         title='enter your facts here'
         onChange={ev => {
           setActiveObject(ev.target.value);
-          onChange(ev.target.value, parsedValue !== false)
+          onChange(ev.target.value, safeParse(ev.target.value))
         }}
         value={activeObject}
       />
@@ -69,17 +68,21 @@ export const RuleEditorAntd = ({
   index = 0,
   depth = 0
 }: RuleEditorProps) => {
+  // const [ruleFacts, setRuleFacts] = useState(facts);
   const [userSize, setUserSize] = useState<SizeType>('middle');
-  const [factKeys] = useState(Object.entries(flattenKeys(facts)));
+  const [factKeys, setFactKeys] = useState(Object.entries(flattenKeys(facts)));
   const [liveRule, setEditRule] = useState(rule);
   const [factKey, operator, term] = liveRule;
-  const key = `${index}-${depth}`;
-  const listId = `${factKeys}-${key}`;
+
+  useEffect(() => {
+    setFactKeys(Object.entries(flattenKeys(facts)));
+  }, [JSON.stringify(facts)])
 
   useEffect(() => {
     onUpdate([factKey, operator, term], index);
   }, [factKey, operator, term])
 
+  const key = `${index}-${depth}`;
   const valueId = `value-${key}`
   const termId = `term-${key}`
   const result = processRuleOrGroup(facts, liveRule)
@@ -202,9 +205,10 @@ const RuleGroupEditorAntd = ({
   return (
     <FlexRow key={`group-edit-${index}-${depth}`}>
       {showFactsEditor && depth === 0 && index === 0 &&
-        <FactsEditor object={liveFacts} onChange={(value, isValid) => {
+        <FactsEditor object={liveFacts} onChange={(stringValue, parsedValue) => {
+          const isValid = !!parsedValue;
           if (isValid) {
-            setLiveFacts(value);
+            setLiveFacts(parsedValue);
           }
         }} />
       }
@@ -231,7 +235,7 @@ const RuleGroupEditorAntd = ({
                   key={`${JSON.stringify(ruleEntry)}-${ruleIndex}-${depth}`}
                   {...{ rule: ruleEntry, facts: liveFacts, index: ruleIndex, depth }}
                 />
-                <div>
+                <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
                   <Button size={userSize} icon={<PlusCircleOutlined />} title='add a rule' onClick={() => onAddRule(ruleIndex + 1)} />
                   {ruleIndex > 0 && <Button size={userSize} icon={<MinusCircleOutlined />} title='remove rule' onClick={() => onDeleteRule(ruleIndex)} />}
                 </div>
@@ -239,10 +243,15 @@ const RuleGroupEditorAntd = ({
               (
                 <RuleGroupEditorAntd
                   key={`${JSON.stringify(ruleEntry)}-${ruleIndex}-${depth}`}
-                  extra={(ruleIndex > 0 ? () => <Button size={userSize} title='remove group' onClick={() => onDeleteRule(ruleIndex)} icon={<MinusCircleOutlined />} /> : null)}
+                  extra={(ruleIndex > 0 ? () => (
+                    <Button 
+                      size={userSize} 
+                      title='remove group' 
+                      onClick={() => onDeleteRule(ruleIndex)} 
+                      icon={<MinusCircleOutlined />} />) : null)}
                   {...{
                     rules: ruleEntry as RuleGroup,
-                    facts,
+                    facts: liveFacts,
                     index: ruleIndex,
                     depth: (depth + 1),
                     onChange: (ruleGroup, i, parentIndex) => {

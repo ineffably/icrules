@@ -13,16 +13,12 @@ module.exports = {
   },
   
   devServer: {
-    port: 8880,
+    port: 8080,
     static: {
       directory: path.join(__dirname, './'),
       publicPath: '/'
     },
   },
-  // externals: {
-  //   React: 'react',
-  //   ReactDOM: 'react-dom'
-  // },
   module: {
     rules: [
       {

@@ -2,8 +2,8 @@ import { ICRulesEditorAntd } from '@icrules/editor';
 import { useState } from 'react';
 import { RuleGroup, processVerbose } from '@icrules/core';
 import { syntaxHighlight } from './utils';
-import './examples.css';
 import { Card } from 'antd';
+import './examples.css';
 
 export const Examples = () => {
   const rules = {
@@ -20,7 +20,8 @@ export const Examples = () => {
   const facts = {
     color: 'blue',
     size: 200,
-    count: 1
+    count: 1,
+    markets: ['en-US', 'en-GB', 'en-CA']
   }
 
   const onChange = (rules: RuleGroup) => {
