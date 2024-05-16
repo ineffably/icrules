@@ -1,6 +1,6 @@
 {
   "name": "@icrules/core",
-  "version": "0.1.1",
+  "version": "0.1.1-alpha.0",
   "description": "A  small, fast and extensible rules engine with a compact JSON footprint",
   "main": "lib/index.js",
   "scripts": {
