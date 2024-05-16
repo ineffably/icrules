@@ -13,4 +13,4 @@
  - *rule editor updates with state and facts editor*
  - *minor typing updates that were missed*
  - *more progressive facts validation*
-
+ - *added validateRule function one can call manually; invalid rules still throw*

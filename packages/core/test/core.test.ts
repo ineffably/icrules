@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Facts, RuleGroup, verbosePlugin, processRules, processVerbose, PluginArgs } from '../src';
+import {
+  type Facts, type RuleGroup, type PluginArgs,
+  verbosePlugin, processRules, processVerbose, validateRule,
+  processRuleOrGroup
+} from '../src';
 
 describe('icrules verification', () => {
   const facts = {
@@ -10,12 +14,12 @@ describe('icrules verification', () => {
     months: [4, 5, 6],
     market: 'en-US',
     markets: ['en-CA', 'en-US'],
-    'name.last' : 'Smith',
+    'name.last': 'Smith',
     selectedProfile: {
       profileId: '1234',
       name: 'Jack',
       products: 20,
-      background: { 
+      background: {
         color: 'blue'
       }
     }
@@ -23,6 +27,36 @@ describe('icrules verification', () => {
 
   const serializedFacts = JSON.stringify(facts);
   const hydratedFacts = JSON.parse(serializedFacts);
+
+  describe('validateRule function', () => {
+    it('should validate rules correctly', () => {
+      expect(validateRule().isValid).toBe(false);
+      expect(validateRule({ all: [['sky', 'eq', 'blue']] }).isValid).toBe(true);
+      expect(validateRule({ all: [['sky', 'eq', null]] }).isValid).toBe(true);
+      expect(validateRule({ all: [['sky', 'eq', '']] }).isValid).toBe(true);
+      expect(validateRule({}).isValid).toBe(false);
+      expect(validateRule(null as any).isValid).toBe(false);
+      expect(validateRule({ all: [] }).isValid).toBe(false);
+      expect(validateRule({ any: [['field']] as any[] }).isValid).toBe(false);
+      expect(validateRule({ any: [[null, null]] as any[] }).isValid).toBe(false);
+      expect(validateRule({ any: ['xyz', 'asdf', '123'] as any[] }).isValid).toBe(false);
+      expect(validateRule({ any: [['xyz', 'asdf', '123']] as any[] }).isValid).toBe(false);
+      expect(validateRule({
+        all: [
+          ['sky', 'eq', 'blue'], 
+          ['count', 'eq', 32], 
+          { any: [['grass', 'eq', 'green']]}
+        ]
+      }).isValid).toBe(true);
+      expect(validateRule({
+        all: [
+          ['sky', 'eq', 'blue'], 
+          ['count', 'eq', 32], 
+          { any: ['grass', 'eq', 'green'] as any[]}
+        ]
+      }).isValid).toBe(false);
+    })
+  })
 
   describe('basic operation and instance validation', () => {
     it('should process a single rule group using basic eq tests', () => {
@@ -32,11 +66,17 @@ describe('icrules verification', () => {
       expect(processRules(facts, { any: [['sky', 'eq', 'green']] }).pass).toBe(false);
     });
 
+    it('should allow calls directly to processRuleOrGroup', () => {
+      expect(() => processRuleOrGroup({}, {})).toThrow();
+      expect(processRuleOrGroup(facts, { all: [['sky', 'eq', 'blue']] }).pass).toBe(true);
+    })
+
     it('should fail if the rule group is invalid', () => {
+      expect(() => processRules()).toThrow();
       expect(() => processRules(facts, { some: [['sky', 'eq', 'blue']] } as any)).toThrow();
       expect(() => processRules(facts, [['sky', 'eq', 'blue']] as any)).toThrow();
-      expect(() => processRules(facts, {all: [['sky']]} as any)).toThrow();
-      expect(() => processRules(facts, {all: [['sky', 'eq']]} as any)).toBeDefined(); // term is undefined if excluded
+      expect(() => processRules(facts, { all: [['sky']] } as any)).toThrow();
+      expect(() => processRules(facts, { all: [['sky', 'eq']] } as any)).toBeDefined(); // term is undefined if excluded
     });
 
     it('should fail if the facts are invalid', () => {
@@ -153,6 +193,11 @@ describe('icrules verification', () => {
 
   describe('verbose plugin and other plugins', () => {
 
+    it('should throw for processVerbose for the same issues as processRules', () => {
+      expect(() => processVerbose(facts, {})).toThrow(); 
+      expect(() => processVerbose({} as Facts, {} as RuleGroup)).toThrow(); 
+    });
+
     it('should allow verbose processing using the intrinsic verbose plugin through processVerbose', () => {
       const processResult = processVerbose(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] });
       expect(processResult.pass).toBe(false);
@@ -175,17 +220,17 @@ describe('icrules verification', () => {
         signedin: false,
         guestid: true
       }
-      
+
       const rule1 = {
         all: [
           ['language', 'eq', 'en'],
-          { 
+          {
             any: [
-              ['signedin', 'eq', true], 
+              ['signedin', 'eq', true],
               ['guestid', 'eq', true]
             ]
           }
-        ] 
+        ]
       } as RuleGroup
 
       const results = processRules(facts1, rule1, [verbosePlugin]);
@@ -260,7 +305,7 @@ describe('icrules verification', () => {
 
     it('should allow you to query arrays', () => {
       const facts = {
-        user : {
+        user: {
           name: 'Jack',
           roles: ['admin', 'user'],
           permissions: ['read', 'write'],
@@ -276,10 +321,10 @@ describe('icrules verification', () => {
         all: [
           ['user.roles', 'has', 'admin'],
           ['user.permissions', 'has', 'read'],
-          ['user.expirations', 'has', { any: ['expiresInDays', 'lte', 30]}]
+          ['user.expirations', 'has', { any: ['expiresInDays', 'lte', 30] }]
         ]
       } as RuleGroup
-      
+
       processRules(facts, testRule);
       // expect(processRules(facts, testRule).pass).toBe(true);
     })
@@ -294,10 +339,10 @@ describe('icrules verification', () => {
       expect(processRules(facts, { any: [['selectedProfile.products', 'lt', 15]] }).pass).toBe(false);
       expect(processRules(facts, { any: [['selectedProfile.products', 'neq', 15]] }).pass).toBe(true);
       expect(processRules(facts, { any: [['selectedProfile.language', 'eq', 'en']] }).pass).toBe(false);
-      
+
       // non-existent should still not pass
       expect(processRules(facts, { any: [['blahblah.nothinghere', 'lt', 25]] }).pass).toBe(false);
-      
+
       // should distinguish between fields with dots and objects
       expect(processRules(facts, { any: [['name.last', 'eq', 'Smith']] }).pass).toBe(true);
       expect(processRules(facts, { any: [['name.last', 'eq', 'Wilson']] }).pass).toBe(false);

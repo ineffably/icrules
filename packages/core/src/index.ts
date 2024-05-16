@@ -15,6 +15,7 @@ export type PluginArgs = {
 };
 export interface ProcessArgs extends PluginArgs { plugins: Plugin[] }
 export interface ProcessResult extends Record<string, any> { pass: boolean }
+export interface RuleEvaluation { isValid: boolean; message?: string; }
 export type ValueType = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function' | 'array';
 export const operators = [
   'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'has', 'nhas', 'in', 'nit'
@@ -129,3 +130,53 @@ export const processVerbose = (facts: Facts = {}, ruleGroup: RuleGroup, plugins:
 );
 
 export const processRules = processGroup;
+
+export function validateRule(ruleGroup = {} as RuleGroup): RuleEvaluation {
+  const isValid = false;
+  if (!ruleGroup) return ({
+    isValid,
+    message: 'No Rule Group Found'
+  });
+  const { all, any } = ruleGroup;
+
+  const validateRuleSet = (rules: Rules) => {
+    if (rules.length === 0) return ({
+      isValid,
+      message: 'No Rule Group Found'
+    });
+    for (let ruleIndex = 0; ruleIndex < rules.length; ruleIndex++) {
+      const ruleGroup = rules[ruleIndex] as RuleGroup;
+      if (ruleGroup?.all || ruleGroup?.any) {
+        return validateRule(ruleGroup);
+      }
+
+      const rule = ruleGroup as Rule;
+      if (!Array.isArray(rule) || rule.length < 2) return ({
+        isValid,
+        message: 'No Rule Group Found'
+      });
+
+      const [field, op] = rule;
+      if (!field || !op) return ({
+        isValid,
+        message: 'Invalid Rule'
+      })
+      if (!operators.includes(op)) return ({
+        isValid,
+        message: 'Invalid Operator'
+      });
+    }
+    return {
+      isValid: true
+    };
+  }
+
+  if (all || any) {
+    return validateRuleSet(all || any);
+  }
+
+  return ({
+    isValid,
+    message: 'No Quantifiers (all|any) Found'
+  });
+}

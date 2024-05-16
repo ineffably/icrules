@@ -25,5 +25,5 @@ module.exports = {
     '<rootDir>/packages/core/src/**/*.ts',
   ],
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
-  coverageReporters: ['json', 'html', 'text'],
+  coverageReporters: ['lcov', 'json', 'html', 'text'],
 };
