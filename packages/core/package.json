@@ -29,5 +29,6 @@
   },
   "jestWebpackResolver": {
     "webpackConfig": "./webpack.config.js"
-  }
+  },
+  "gitHead": "859aae219767ba586438e4e573b7fb06fae91cda"
 }
