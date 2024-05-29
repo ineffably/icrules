@@ -37,12 +37,12 @@ export const processResult = ({ pass, facts, rule, group, plugins = [] as Plugin
 
 export function processRuleOrGroup(facts: Facts = {}, rule: Rule | RuleGroup, plugins: Plugin[] = []): ProcessResult {
   if (isGroup(rule)) return processGroup(facts, rule as RuleGroup, plugins);
-  const [field, op, term] = rule as Rule;
-  if (field === null || field === undefined || !op) {
+  const [subject, op, term] = rule as Rule;
+  if (subject === null || subject === undefined || !op) {
     throw new Error(`Invalid Rule\n${JSON.stringify(rule, null, 2)}`);
   }
   const ruleResult = { pass: false } as PluginArgs;
-  const value = facts && facts[field];
+  const value = facts && facts[subject];
   const valueType = typeof value as ValueType;
   const termIsObject = typeof term == 'object';
   const termIsRule = termIsObject && isGroup(term);
@@ -54,9 +54,9 @@ export function processRuleOrGroup(facts: Facts = {}, rule: Rule | RuleGroup, pl
   }
 
   // if fields contain dot refs, let's see if there's an object to query
-  if (field.indexOf(defaultDelimiter) > 0) {
+  if (subject.indexOf(defaultDelimiter) > 0) {
     const flatFacts = flattenKeys(facts);
-    const queryValue = flatFacts[field];
+    const queryValue = flatFacts[subject];
     const objType = typeof queryValue;
     if (queryValue) {
       factQuery.value = queryValue;
