@@ -1,6 +1,6 @@
 {
   "name": "@icrules/core",
-  "version": "0.1.1-alpha.0",
+  "version": "0.1.1-alpha.1",
   "description": "Intuitive Compact Rules: A small and extensible rules engine with a compact JSON footprint.",
   "main": "lib/index.js",
   "scripts": {
@@ -29,6 +29,5 @@
   },
   "jestWebpackResolver": {
     "webpackConfig": "./webpack.config.js"
-  },
-  "dependencies": {}
+  }
 }
