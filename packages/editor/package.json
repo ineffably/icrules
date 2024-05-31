@@ -5,8 +5,9 @@
   "main": "lib/index.js",
   "scripts": {
     "clean": "rm -rf ./lib",
-    "build": "webpack",
-    "watch": "webpack watch",
+    "watch": "webpack --mode development watch",
+    "build:dev": "webpack --mode development",
+    "build": "webpack --mode production",
     "build:clean": "npm run clean && npm run build",
     "test": "jest --config ./../../jest.config.js ./test/rule-editor.test.tsx --coverage"
   },
@@ -14,7 +15,6 @@
   "author": "Chad Neff <ccneff@gmail.com> (https://github.com/ineffably)",
   "license": "MIT",
   "dependencies": {
-    "@emotion/styled": "^11.11.0",
     "@icrules/core": "^0.1.2-alpha.0"
   },
   "devDependencies": {
@@ -29,6 +29,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-webpack-resolver": "^0.3.0",
+    "mini-css-extract-plugin": "^2.9.0",
     "style-loader": "^3.3.3",
     "ts-jest": "^29.1.2",
     "ts-loader": "^9.4.3",
@@ -40,8 +41,7 @@
   "peerDependencies": {
     "@ant-design/icons": "^5.3.0",
     "antd": "^5.14.0",
-    "react": ">= 17.0.2 <= 18.2.0",
-    "react-dom": ">= 17.0.2 <= 18.2.0"
+    "react": ">= 17.0.2 <= 18.2.0"
   },
   "gitHead": "859aae219767ba586438e4e573b7fb06fae91cda"
 }

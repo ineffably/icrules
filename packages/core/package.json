@@ -3,11 +3,14 @@
   "version": "0.1.2-alpha.0",
   "description": "Intuitive Compact Rules: A small and extensible rules engine with a compact JSON footprint.",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config ./../../jest.config.js ./test/core.test.ts --coverage",
-    "build": "webpack",
     "clean": "rm -rf ./lib",
-    "watch": "webpack watch",
+    "watch": "webpack watch --mode development",
+    "build:dev": "webpack --mode development",
+    "build:clean:dev": "npm run clean && npm run build:dev",
+    "build": "webpack --mode production",
     "build:clean": "npm run clean && npm run build",
     "gendocs": "typedoc --out ../../docs ./src"
   },

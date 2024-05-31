@@ -1,0 +1,3 @@
+# @icrules/editor
+
+## Documentation placeholder

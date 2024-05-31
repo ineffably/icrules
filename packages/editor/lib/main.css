@@ -1,0 +1,142 @@
+.rule-group-editor {
+  display: flex;
+  flex-direction: row;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-size: 14px;
+  background-color: #eeeeeeee;
+  margin: 2px;
+  border: 2px solid #bbb;
+  padding: 2px 0;
+}
+
+.rules {
+  margin: 0px 0px;
+  padding: 2px 2px;
+  line-height: 22px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+}
+
+.rule-entry {
+  margin: 2px 0px;
+  padding: 2px 4px;
+  line-height: 22px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  height: 22px;
+}
+
+.rule-list .editor-wrap {
+  display: flex;
+  flex-direction: row;
+}
+
+.rule-list .addrule {
+  margin: 6px 5px 0px 0px;
+  white-space: nowrap;
+}
+
+.rule-list .remove-group-cell {
+  margin: 14px 5px 0px 0px;
+}
+
+.rule-entry option {
+  font-size: 15px;
+}
+
+.rule-entry option {
+  height: 22px;
+  padding: 0 5px;
+}
+
+.rule-result {
+  width: 15px;
+  text-align: center;
+  vertical-align: middle;
+  margin: 4px 7px 0 8px;
+  line-height: 22px;
+  font-size: 17px;
+}
+
+.check-mark {
+  width: 15px;
+  text-align: center;
+  vertical-align: middle;
+  margin: 1px 8px 0 0px;
+  font-size: 20px;
+}
+
+.check-mark .pass, .rule-result .pass {
+  font-family: "Segoe UI Symbol";
+  color: green;
+}
+
+.check-mark .fail, .rule-result .fail {
+  font-family: "Segoe UI Symbol";
+  color: darkred;
+}
+
+.rule-entry .auto-selection {
+  position: absolute;
+  z-index: 2;
+  background-color: #eeeeeeee;
+}
+
+.rule-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.rule-list .rule-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.rule-list .edit-rule-buttons {
+  margin: 5px 5px 0px 0px;
+}
+
+.rule-list .edit-group-buttons {
+  margin: 5px 5px 0px 0px;
+}
+
+.rule-entry select,
+.rule-entry input {
+  font-size: 14px;
+  border: 0;
+  line-height: 24px;
+  height: 22px;
+  padding: 2px 4px;
+}
+
+.rule-entry select {
+  line-height: 24px;
+  height: 26px;
+}
+
+.rule-entry select:focus,
+.rule-entry input:focus {
+  outline: none;
+}
+
+.rule-editor {
+  display: flex;
+  flex-direction: row;
+  background-color: #eeeeeeee;
+}
+
+.facts-status {
+  padding: 2px; 
+  border: 1px solid #333;
+}
+
+button.add-group, button.remove-group {
+  font-family: "Segoe UI Symbol";
+  vertical-align: middle;
+  line-height: 19px;
+  margin: 0px 2px;
+}
+
+

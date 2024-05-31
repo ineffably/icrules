@@ -1,6 +1,7 @@
 {
   "name": "icrules",
   "version": "0.1.1",
+  "private": true,
   "scripts": {
     "test": "jest --config ./jest.config.js  --coverage",
     "build": "npm run build --workspaces --if-present",
