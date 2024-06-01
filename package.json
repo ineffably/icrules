@@ -9,8 +9,7 @@
     "gendocs": "npm run gendocs --workspace=@icrules/core",
     "clean": "npm run clean --workspaces --if-present",
     "examples": "npm run examples --workspace=@icrules/examples",
-    "watch": "concurrently \"npm run watch --workspace=@icrules/core\" \"npm run watch --workspace=@icrules/editor\"",
-    "build:clean": "npm run build:clean --workspaces --if-present"
+    "watch": "concurrently \"npm run watch --workspace=@icrules/core\" \"npm run watch --workspace=@icrules/editor\""
   },
   "keywords": [
     "rules",
@@ -34,7 +33,7 @@
     "@typescript-eslint/eslint-plugin": "^5.59.9",
     "babel-loader": "^9.1.2",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
-    "concurrently": "^8.1.0",
+    "concurrently": "^8.2.2",
     "eslint": "^8.42.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.5.0",

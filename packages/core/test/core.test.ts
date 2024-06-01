@@ -43,16 +43,16 @@ describe('icrules verification', () => {
       expect(validateRule({ any: [['xyz', 'asdf', '123']] as any[] }).isValid).toBe(false);
       expect(validateRule({
         all: [
-          ['sky', 'eq', 'blue'], 
-          ['count', 'eq', 32], 
-          { any: [['grass', 'eq', 'green']]}
+          ['sky', 'eq', 'blue'],
+          ['count', 'eq', 32],
+          { any: [['grass', 'eq', 'green']] }
         ]
       }).isValid).toBe(true);
       expect(validateRule({
         all: [
-          ['sky', 'eq', 'blue'], 
-          ['count', 'eq', 32], 
-          { any: ['grass', 'eq', 'green'] as any[]}
+          ['sky', 'eq', 'blue'],
+          ['count', 'eq', 32],
+          { any: ['grass', 'eq', 'green'] as any[] }
         ]
       }).isValid).toBe(false);
     })
@@ -194,8 +194,8 @@ describe('icrules verification', () => {
   describe('verbose plugin and other plugins', () => {
 
     it('should throw for processVerbose for the same issues as processRules', () => {
-      expect(() => processVerbose(facts, {})).toThrow(); 
-      expect(() => processVerbose({} as Facts, {} as RuleGroup)).toThrow(); 
+      expect(() => processVerbose(facts, {})).toThrow();
+      expect(() => processVerbose({} as Facts, {} as RuleGroup)).toThrow();
     });
 
     it('should allow verbose processing using the intrinsic verbose plugin through processVerbose', () => {
@@ -207,7 +207,7 @@ describe('icrules verification', () => {
     });
 
     it('should see verbose results using the internal verbosePlugin through process', () => {
-      const processResult = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [verbosePlugin]);
+      const processResult = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, { plugins: [verbosePlugin] });
       expect(processResult.pass).toBe(false);
       expect(processResult.group.pass).toBe(false);
       expect(processResult.group.all[0].pass).toBe(true);
@@ -233,7 +233,7 @@ describe('icrules verification', () => {
         ]
       } as RuleGroup
 
-      const results = processRules(facts1, rule1, [verbosePlugin]);
+      const results = processRules(facts1, rule1, { plugins: [verbosePlugin] });
       expect(results.pass).toBe(true);
     });
 
@@ -250,7 +250,7 @@ describe('icrules verification', () => {
           return ({ pass, count: ruleCounts.count, groupCount: ruleCounts.groupCount })
         }
       }
-      const processResult = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [ruleCounts.plugin]);
+      const processResult = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, { plugins: [ruleCounts.plugin] });
       expect(processResult.pass).toBe(false);
       expect(processResult.count).toBe(3);
       expect(processResult.groupCount).toBe(1);
@@ -258,7 +258,7 @@ describe('icrules verification', () => {
 
     it('should allow the plugin to change the outcome', () => {
       const alwaysTrue = () => ({ pass: true })
-      const trueResults = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [alwaysTrue]);
+      const trueResults = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, { plugins: [alwaysTrue] });
       expect(trueResults.pass).toBe(true);
       expect(Object.keys(trueResults).length).toBe(1);
       expect(Object.keys(trueResults)[0]).toBe('pass');
@@ -266,7 +266,7 @@ describe('icrules verification', () => {
 
     it('should allow a plugin that just changest the group outcome', () => {
       const alwaysTrue = ({ group, pass }: PluginArgs) => ({ pass: group ? true : pass });
-      const trueResults = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [alwaysTrue]);
+      const trueResults = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, { plugins: [alwaysTrue] });
       expect(trueResults.pass).toBe(true);
       expect(Object.keys(trueResults).length).toBe(1);
       expect(Object.keys(trueResults)[0]).toBe('pass');
@@ -278,22 +278,22 @@ describe('icrules verification', () => {
       const justEmptyObject = () => ({} as any)
       const justNumber = () => (1 as any)
 
-      const nullPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justNull]);
+      const nullPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, { plugins: [justNull] });
       expect(nullPlugin.pass).toBe(false);
       expect(Object.keys(nullPlugin).length).toBe(1);
       expect(Object.keys(nullPlugin)[0]).toBe('pass');
 
-      const undefinedPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justUndefined]);
+      const undefinedPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, { plugins: [justUndefined] });
       expect(undefinedPlugin.pass).toBe(false);
       expect(Object.keys(undefinedPlugin).length).toBe(1);
       expect(Object.keys(undefinedPlugin)[0]).toBe('pass');
 
-      const emptyObjectPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justEmptyObject]);
+      const emptyObjectPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, { plugins: [justEmptyObject] });
       expect(emptyObjectPlugin.pass).toBe(false);
       expect(Object.keys(emptyObjectPlugin).length).toBe(1);
       expect(Object.keys(emptyObjectPlugin)[0]).toBe('pass');
 
-      const numberPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, [justNumber]);
+      const numberPlugin = processRules(facts, { all: [['sky', 'has', 'lu'], ['count', 'gt', 32]] }, { plugins: [justNumber] });
       expect(numberPlugin.pass).toBe(false);
       expect(Object.keys(numberPlugin).length).toBe(1);
       expect(Object.keys(numberPlugin)[0]).toBe('pass');
@@ -347,5 +347,19 @@ describe('icrules verification', () => {
       expect(processRules(facts, { any: [['name.last', 'eq', 'Smith']] }).pass).toBe(true);
       expect(processRules(facts, { any: [['name.last', 'eq', 'Wilson']] }).pass).toBe(false);
     })
+  })
+
+  describe('should handle special plugin operators', () => {
+
+    it('should use a custom operator from a plugin', () => {
+      const operators = {
+        startsWith: ({ value, term }) => value.startsWith(term),
+        endsWith: ({ value, term }) => value.endsWith(term)
+      }
+
+      expect(processRules(facts, { all: [['sky', 'startsWith', 'bl']] }, { operators }).pass).toBe(true);
+      expect(processRules(facts, { all: [['sky', 'endsWith', 'ue']] }, { operators }).pass).toBe(true);
+    });
+
   })
 });

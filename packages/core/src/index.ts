@@ -2,24 +2,31 @@ export type Subject = string;
 export type Term = any;
 export type Rule = [Subject, Operator, Term];
 export type Quantifiers = 'all' | 'any';
-export type Operator = 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'has' | 'nhas' | 'in' | 'nit';
+export type Operator = 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'has' | 'nhas' | 'in' | 'nit' | string;
 export type Rules = (Rule | RuleGroup)[];
 export type RuleGroup = { all?: Rules, any?: Rules };
 export type Facts = Record<string, any> | Record<string, any>[];
-export type Plugin = (args: PluginArgs) => ProcessResult;
+export type ResultPlugin = (args: PluginArgs) => ProcessResult;
+export type OperatorPlugin = Record<string, (args: OperatorFuncArgs) => boolean>;
+export type OperatorFuncArgs = {
+  value: any;
+  term: any;
+}
 export type PluginArgs = {
   pass: boolean;
   rule: Rule | RuleGroup;
   facts?: Facts;
   group?: any;
 };
-export interface ProcessArgs extends PluginArgs { plugins: Plugin[] }
+export interface ProcessArgs extends PluginArgs { plugins: ResultPlugin[] }
 export interface ProcessResult extends Record<string, any> { pass: boolean }
 export interface RuleEvaluation { isValid: boolean; message?: string; }
+export interface Options {
+  plugins?: ResultPlugin[];
+  operators?: OperatorPlugin;
+}
 export type ValueType = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function' | 'array';
-export const operators = [
-  'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'has', 'nhas', 'in', 'nit'
-] as Operator[];
+export const internalOperatorValues: Operator[] = ['eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'has', 'nhas', 'in', 'nit'];
 
 const defaultDelimiter = '.';
 
@@ -29,24 +36,60 @@ export function isGroup(testRule: Rule | RuleGroup = {}): boolean {
   return false;
 }
 
-export const verbosePlugin = ({ pass, rule, group }: PluginArgs) => ({ pass, rule, group });
+export function flattenKeys(obj: any, prefix = '', delimiter = '.'): Record<string, any> {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      return { ...acc, ...flattenKeys(value, `${prefix}${key}${delimiter}`) };
+    }
+    return { ...acc, [`${prefix}${key}`]: value };
+  }, {})
+}
 
-export const processResult = ({ pass, facts, rule, group, plugins = [] as Plugin[] }: ProcessArgs): ProcessResult => (
+export const processResult = ({ pass, facts, rule, group, plugins = [] as ResultPlugin[] }: ProcessArgs): ProcessResult => (
   plugins.reduce((pluginResult, plugin) => ({ ...pluginResult, ...(plugin({ pass, facts, rule, group }) || {}) }), { pass })
 )
 
-export function processRuleOrGroup(facts: Facts = {}, rule: Rule | RuleGroup, plugins: Plugin[] = []): ProcessResult {
-  if (isGroup(rule)) return processGroup(facts, rule as RuleGroup, plugins);
+const in_nit = (operator: Operator) => ({ value, term }) => {
+  if (Array.isArray(term) || ['string', 'object'].includes(typeof term)) {
+    const pass = term.includes(value);
+    return operator === 'in' ? pass : !pass;
+  }
+  return false;
+}
+
+const has_nhas = (operator: Operator) => ({ value, term }) => {
+  if (['number', 'bigint', 'symbol', 'undefined'].includes(typeof value)) return false;
+  const pass = value.includes(term);
+  return (operator === 'has') ? pass : !pass;
+}
+
+export const internalOperators = {
+  eq: ({ value, term }) => value === term,
+  neq: ({ value, term }) => value !== term,
+  gt: ({ value, term }) => value > term,
+  gte: ({ value, term }) => value >= term,
+  lt: ({ value, term }) => value < term,
+  lte: ({ value, term }) => value <= term,
+  in: in_nit('in'),
+  nit: in_nit('nit'),
+  has: has_nhas('has'),
+  nhas: has_nhas('nhas')
+} as OperatorPlugin;
+
+export function processRuleOrGroup(facts: Facts = {}, rule: Rule | RuleGroup, options: Options = {}): ProcessResult {
+  const { plugins = [], operators = {} } = options;
+  if (isGroup(rule)) return processGroup(facts, rule as RuleGroup, { plugins });
+
   const [subject, op, term] = rule as Rule;
   if (subject === null || subject === undefined || !op) {
     throw new Error(`Invalid Rule\n${JSON.stringify(rule, null, 2)}`);
   }
+
   const ruleResult = { pass: false } as PluginArgs;
-  const value = facts && facts[subject];
+  const value = facts?.[subject];
   const valueType = typeof value as ValueType;
   const termIsObject = typeof term == 'object';
   const termIsRule = termIsObject && isGroup(term);
-  const termIsArray = Array.isArray(term);
   const factQuery = {
     value,
     type: valueType,
@@ -72,43 +115,52 @@ export function processRuleOrGroup(facts: Facts = {}, rule: Rule | RuleGroup, pl
   const termValue = isNumeric ? parseInt(term, 10) : term;
   const factValue = factQuery.value;
 
-  if (op === 'has' || op === 'nhas') {
-    if (['number', 'bigint', 'symbol', 'undefined'].includes(typeof factValue)) return { pass: false };
-    const pass = factValue.includes(term);
-    ruleResult.pass = (op === 'nhas') ? !pass : pass;
+  if (internalOperators[op]) {
+    ruleResult.pass = internalOperators[op]({ value: factValue, term: termValue });
   }
 
-  if (op === 'in' || op === 'nit') {
-    const valueType = typeof term;
-    if (termIsArray || ['string', 'object'].includes(valueType)) {
-      ruleResult.pass = term.includes(factValue);
-    }
+  // evaluate users operators; which can override internal operators 
+  if (operators[op]) {
+    ruleResult.pass = operators[op]({ value: factValue, term: termValue });
   }
-
-  if (op === 'eq') { ruleResult.pass = factValue === termValue }
-  if (op === 'neq') { ruleResult.pass = factValue !== termValue }
-  if (op === 'gt') { ruleResult.pass = factValue > termValue }
-  if (op === 'gte') { ruleResult.pass = factValue >= termValue }
-  if (op === 'lt') { ruleResult.pass = factValue < termValue }
-  if (op === 'lte') { ruleResult.pass = factValue <= termValue }
 
   return processResult({
     ...ruleResult, rule, facts, plugins
   } as ProcessArgs);
 }
 
-export function flattenKeys(obj: any, prefix = '', delimiter = '.'): any {
-  return Object.entries(obj).reduce((acc, [key, value]) => {
-    if (typeof value === 'object' && !Array.isArray(value)) {
-      return { ...acc, ...flattenKeys(value, `${prefix}${key}${delimiter}`) };
-    }
-    return { ...acc, [`${prefix}${key}`]: value };
-  }, {})
-}
-
-export function processGroup(facts: Facts = {}, ruleGroup: RuleGroup = {}, plugins: Plugin[] = []): ProcessResult {
+/**
+ * 
+ * Here is sample of what constructing a rule manually against a small set of facts would look like in javascript
+ * 
+ * ```ts
+ *   import { processRules } from '@icrules/core';
+ * 
+ *   const facts = { 
+ *     market: 'en-US', 
+ *     color: 'blue', 
+ *     diameter: 10 
+ *   };
+ * 
+ *   const rules = { 
+ *     any: [
+ *       ['market', 'eq', 'en-US'], 
+ *       ['diameter', 'gt', 5]
+ *     ] 
+ *   };
+ * 
+ *   const result = processRules(facts, rules);
+ *   
+ *   if(results.pass){
+ *     // do the thing that needs done
+ *   }
+ *  
+ * ```
+ */
+export function processGroup(facts: Facts = {}, ruleGroup: RuleGroup = {}, options: Options = {}): ProcessResult {
   const { all, any } = ruleGroup;
-  const action = rule => processRuleOrGroup(facts, rule, plugins);
+  const { plugins = [] } = options;
+  const action = rule => processRuleOrGroup(facts, rule, options);
 
   if (all) {
     const groupResult = all.map(action);
@@ -125,11 +177,11 @@ export function processGroup(facts: Facts = {}, ruleGroup: RuleGroup = {}, plugi
   throw new Error(`Invalid RuleGroup\n${JSON.stringify(ruleGroup, null, 2)}`,);
 }
 
-export const processVerbose = (facts: Facts = {}, ruleGroup: RuleGroup, plugins: Plugin[] = []) => (
-  processGroup(facts, ruleGroup, [verbosePlugin, ...plugins])
-);
+export const verbosePlugin = ({ pass, rule, group }: PluginArgs) => ({ pass, rule, group });
 
-export const processRules = processGroup;
+export const processVerbose = (facts: Facts = {}, ruleGroup: RuleGroup, plugins: ResultPlugin[] = []) => (
+  processGroup(facts, ruleGroup, { plugins: [verbosePlugin, ...plugins] })
+);
 
 export function validateRule(ruleGroup = {} as RuleGroup): RuleEvaluation {
   const isValid = false;
@@ -161,7 +213,7 @@ export function validateRule(ruleGroup = {} as RuleGroup): RuleEvaluation {
         isValid,
         message: 'Invalid Rule'
       })
-      if (!operators.includes(op)) return ({
+      if (!internalOperatorValues.includes(op)) return ({
         isValid,
         message: 'Invalid Operator'
       });
@@ -180,3 +232,12 @@ export function validateRule(ruleGroup = {} as RuleGroup): RuleEvaluation {
     message: 'No Quantifiers (all|any) Found'
   });
 }
+
+/*
+```
+
+```
+*/
+export const processRules = processGroup;
+
+export default processRules;

@@ -15,7 +15,7 @@ Rules include a quantifier and a list of rules that are evaluated individually a
 
 Here is sample of what constructing a rule manually against a small set of facts would look like...
 ```TypeScript
-import { processRule } from '@icrules/core';
+import { processRules } from '@icrules/core';
 
 const facts = { 
   market: 'en-US', 
@@ -30,7 +30,7 @@ const rules = {
   ] 
 };
 
-const result = processRule(facts, rules);
+const result = processRules(facts, rules);
 
 // result.pass is true if market is en-US and diameter is greater than 5
 console.log(result.pass) 
@@ -76,9 +76,9 @@ Using this scheme allows us to construct more complex rules. It's as simple as p
 
 ## ICRules API
 
-### processRule()
+### processRules()
 ```TypeScript
-import { processRule, Facts, Rules, Plugin } from '@icrules/core';
+import { processRules, Facts, Rules, Plugin } from '@icrules/core';
 
 const facts: Facts = {
   market: 'en-US', 
@@ -93,7 +93,7 @@ const rules: Rules = {
 }
 
 const plugins = [] as Plugin[];
-const results: ProcessResult = processRule(facts, rules, plugins);
+const results: ProcessResult = processRules(facts, rules, plugins);
 
 if(results.pass){
   // do the thing that needs done
@@ -109,7 +109,7 @@ if(results.pass){
 There is a plugin model that allows us to extend the results of the rules being processed. That plugin model is used internally to create a `verbosePlugin` result. 
 
 ```TypeScript
-import { processRule } from '@icrules/core';
+import { processRules } from '@icrules/core';
 
 // sample facts
 const facts = {
@@ -134,7 +134,7 @@ const rule = {
 // the verbose plugin is fairly basic in that it simply returns the 
 // values sent in on each level with zero logic, filters and processing
 const verbosePlugin = ({ pass, rule, group }) => ({ pass, rule, group });
-const processResult = processRule(facts, rule, [verbosePlugin]);
+const processResult = processRules(facts, rule, [verbosePlugin]);
 
 ```
 The plugin or plugins are processed for each rule and group evaluated.

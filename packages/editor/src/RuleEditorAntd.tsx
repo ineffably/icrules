@@ -1,4 +1,4 @@
-import { type Operator, type RuleGroup, operators, processRuleOrGroup, Quantifiers, Rule, processVerbose, flattenKeys } from '@icrules/core';
+import { type Operator, type RuleGroup, internalOperatorValues, processRuleOrGroup, Quantifiers, Rule, processVerbose, flattenKeys } from '@icrules/core';
 import { useEffect, useState } from 'react';
 import { opMap, type ICRulesEditorProps, type RuleEditorProps, type RuleGroupEditorProps, FactsEditorProps, safeParse } from '.';
 import { AutoComplete, Button, Card, Input, Select, Space, Tag, Tooltip } from 'antd';
@@ -86,7 +86,7 @@ export const RuleEditorAntd = ({
             size={userSize}
             value={operator}
             onChange={ev => setEditRule([factKey, (ev as Operator), term])}
-            options={operators.map(op => ({ label: opMap[op], value: op }))}
+            options={internalOperatorValues.map(op => ({ label: opMap[op], value: op }))}
           />
         </Tooltip>
       </div>

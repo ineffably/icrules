@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FactsEditorProps, ICRulesEditorProps, RuleEditorProps, RuleGroupEditorProps, opMap, safeParse } from '.';
-import { Operator, operators, processRuleOrGroup, processVerbose, Quantifiers, Rule, RuleGroup } from '@icrules/core';
+import { Operator, internalOperatorValues, processRuleOrGroup, processVerbose, Quantifiers, Rule, RuleGroup } from '@icrules/core';
 import './editorStyle.css';
 
 let lastId = null;
@@ -50,7 +50,7 @@ const RuleEditor = ({
       </div>
       <div key={'rule-op'} className="rule-entry rule-op">
         <select value={operator} onChange={ev => setEditRule([factKey, (ev.target.value as Operator), term])}>
-          {operators.map(op => <option value={op}>{opMap[op]}</option>)}
+          {internalOperatorValues.map(op => <option value={op}>{opMap[op]}</option>)}
         </select>
       </div>
       <div key={'rule-term'} className="rule-entry rule-term">

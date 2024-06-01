@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "clean": "rm -rf ./lib",
-    "watch": "webpack --mode development watch",
+    "watch": "webpack watch --mode development",
     "build:dev": "webpack --mode development",
     "build": "webpack --mode production",
     "build:clean": "npm run clean && npm run build",
