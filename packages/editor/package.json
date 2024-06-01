@@ -1,6 +1,6 @@
 {
   "name": "@icrules/editor",
-  "version": "0.1.4-alpha.0",
+  "version": "0.2.0-alpha.0",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -15,7 +15,7 @@
   "author": "Chad Neff <ccneff@gmail.com> (https://github.com/ineffably)",
   "license": "MIT",
   "dependencies": {
-    "@icrules/core": "^0.1.3-alpha.0"
+    "@icrules/core": "^0.2.0-alpha.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",
