@@ -36,6 +36,11 @@ const result = processRules(facts, rules);
 console.log(result.pass) 
 ```
 
+### Examples and Documentation
+
+<a href="./index.html">You can find the Github pages hosted examples and documentation here</a>
+
+
 ### Rule Schema
 
 The rules schema utilizes a compact human readable JSON compatible JavaScript model.

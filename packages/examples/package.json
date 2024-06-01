@@ -17,7 +17,8 @@
     "webpack-dev-server": "^4.15.2"
   },
   "scripts": {
-    "examples": "webpack serve --mode development --devtool source-map --hot"
+    "examples": "webpack serve --mode development --devtool source-map --hot",
+    "build": "webpack --mode development --devtool source-map"
   },
   "keywords": [],
   "author": "Chad Neff <ccneff@gmail.com> (https://github.com/ineffably)",

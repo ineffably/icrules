@@ -6,7 +6,7 @@
     "test": "jest --config ./jest.config.js  --coverage",
     "build": "npm run build --workspaces --if-present",
     "editor": "npm run editor --workspace=editor",
-    "gendocs": "npm run gendocs --workspace=@icrules/core",
+    "gendocs": "npm run gendocs --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
     "examples": "npm run examples --workspace=@icrules/examples",
     "watch": "concurrently \"npm run watch --workspace=@icrules/core\" \"npm run watch --workspace=@icrules/editor\""
