@@ -38,8 +38,7 @@ console.log(result.pass)
 
 ### Examples and Documentation
 
-<a href="./index.html">You can find the Github pages hosted examples and documentation here</a>
-
+<a href="https://ineffably.github.io/icrules/">You can find the Github pages hosted examples and documentation here</a>
 
 ### Rule Schema
 
