@@ -1,8 +1,9 @@
+import { Card } from 'antd';
 import { ICRulesEditorAntd } from '@icrules/editor';
 import { useState } from 'react';
-import { RuleGroup, processVerbose } from '@icrules/core';
+import { type RuleGroup, processVerbose } from '@icrules/core';
 import { syntaxHighlight } from './utils';
-import { Card } from 'antd';
+import { version } from '@icrules/editor/package.json';
 import './examples.css';
 
 export const Examples = () => {
@@ -15,7 +16,7 @@ export const Examples = () => {
     ]
   } as RuleGroup;
 
-  const [liveRules, setLiveRules] = useState(rules);
+  const [activeRules, setActiveRules] = useState(rules);
 
   const facts = {
     color: 'blue',
@@ -25,9 +26,9 @@ export const Examples = () => {
   }
 
   const onChange = (rules: RuleGroup) => {
-    setLiveRules(rules);
+    setActiveRules(rules);
   }
-  const { pass, group } = processVerbose(facts, liveRules);
+  const { pass, group } = processVerbose(facts, activeRules);
   const testFacts = {
     simple: {
       color: 'blue',
@@ -64,14 +65,16 @@ export const Examples = () => {
   }
 
 return (
-  <Card title={<b>ICRules Fancy Editor Example</b>} size='small'>
+  <Card title={<b>ICRules Fancy Editor Example v{version} </b>} size='small'>
     <div style={{ display: 'flex', flexDirection: 'row', width: '98vw' }}>
-      <ICRulesEditorAntd {...{ facts, rules: liveRules, onChange }} />
+      <ICRulesEditorAntd {...{ facts, rules: activeRules, onChange }} />
       <Card style={{ margin: '0 4px' }} title={'JSON rules'} size='default' hoverable={true} styles={{ body: { padding: 0 } }} >
-        <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(liveRules, null, 2)) }}></pre>
+        <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(activeRules, null, 2)) }}></pre>
       </Card>
       <Card style={{ margin: '0 4px', padding: 0 }} title='Verbose JSON rules and result' size='default' hoverable={true} styles={{ body: { padding: 0 } }}>
-        <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify({ pass, group }, null, 2)) }}></pre>
+        <div style={{ overflowY: 'auto', height: '80vh' }}>
+          <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify({ pass, group }, null, 2)) }}></pre>
+        </div>
       </Card>
     </div>
   </Card>

@@ -40,7 +40,7 @@ console.log(result.pass)
 
 The rules schema utilizes a compact human readable JSON compatible JavaScript model.
 
-A Rule Group has a index key quatifier of `all` or `any` and referenecs a Rule or RuleGroup
+A Rule Group has a index key quantifier of `all` or `any` and references a Rule or RuleGroup
 
 A simple rule looks like this given facts are `{ grass: 'green' }`
 ```TypeScript

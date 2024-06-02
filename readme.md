@@ -9,6 +9,9 @@ An extensible JavaScript rules engine with serialized compact JSON container wit
 ```shell
 # Install
 npm i @icrules/core
+
+# There is also an editor if that's interesting
+npm i @icrules/editor
 ```
 
 Rules include a quantifier and a list of rules that are evaluated individually against the facts. 
@@ -32,19 +35,32 @@ const rules = {
 
 const result = processRules(facts, rules);
 
-// result.pass is true if market is en-US and diameter is greater than 5
-console.log(result.pass) 
+if(result.pass) {
+  // do all the things!
+}
+
 ```
 
 ### Examples and Documentation
 
 <a href="https://ineffably.github.io/icrules/">You can find the Github pages hosted examples and documentation here</a>
 
+You can also clone this repo to run the examples locally; once cloned...
+```shell
+# install dependencies 
+npm i
+# get a fresh local build
+npm run build
+# run the examples site
+npm run examples
+# navigate to http://localhost:8080/
+```
+
 ### Rule Schema
 
 The rules schema utilizes a compact human readable JSON compatible JavaScript model.
 
-A Rule Group has a index key quatifier of `all` or `any` and referenecs a Rule or RuleGroup
+A Rule Group has a index key quantifier of `all` or `any` and references a Rule or RuleGroup
 
 A simple rule looks like this given facts are `{ grass: 'green' }`
 ```TypeScript
