@@ -14,8 +14,17 @@
     "build:clean": "npm run clean && npm run build",
     "gendocs": "typedoc --out ./docs ./src"
   },
-  "keywords": [],
+  "keywords": [
+    "rulesengine",
+    "extensible",
+    "rules",
+    "jsonrules"
+  ],
   "author": "Chad Neff <ccneff@gmail.com> (https://github.com/ineffably)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ineffably/icrules.git"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.2.5",

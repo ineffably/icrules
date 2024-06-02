@@ -12,8 +12,17 @@
     "test": "jest --config ./../../jest.config.js ./test/rule-editor.test.tsx --coverage",
     "gendocs": "typedoc --out ./docs ./src"
   },
-  "keywords": [],
+  "keywords": [
+    "rules-engine",
+    "rules-editor",
+    "json",
+    "React"
+  ],
   "author": "Chad Neff <ccneff@gmail.com> (https://github.com/ineffably)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ineffably/icrules.git"
+  },
   "license": "MIT",
   "dependencies": {
     "@icrules/core": "^0.2.1-alpha.0"
