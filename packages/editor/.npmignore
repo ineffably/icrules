@@ -4,4 +4,4 @@ test
 lerna.json
 webpack.config.js
 tsconfig.json
-
+docs
