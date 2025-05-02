@@ -67,7 +67,7 @@ export const Examples = () => {
 return (
   <Card title={<b>ICRules Fancy Editor Example v{version} </b>} size='small'>
     <div style={{ display: 'flex', flexDirection: 'row', width: '98vw' }}>
-      <ICRulesEditorAntd {...{ facts, rules: activeRules, onChange }} />
+      <ICRulesEditorAntd {...{ facts, rules: activeRules, onChange, options: { showFactsEditor: false } }} />
       <Card style={{ margin: '0 4px' }} title={'JSON rules'} size='default' hoverable={true} styles={{ body: { padding: 0 } }} >
         <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(activeRules, null, 2)) }}></pre>
       </Card>

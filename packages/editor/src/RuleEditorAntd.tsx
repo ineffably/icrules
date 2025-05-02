@@ -1,6 +1,6 @@
 import { type Operator, type RuleGroup, internalOperatorValues, processRuleOrGroup, Quantifiers, Rule, processVerbose, flattenKeys } from '@icrules/core';
 import { useEffect, useState } from 'react';
-import { opMap, type ICRulesEditorProps, type RuleEditorProps, type RuleGroupEditorProps, FactsEditorProps, safeParse } from '.';
+import { opMap, type ICRulesEditorProps, type RuleEditorProps, type RuleGroupEditorProps, type FactsEditorProps, safeParse } from '.';
 import { AutoComplete, Button, Card, Input, Select, Space, Tag, Tooltip } from 'antd';
 import { SizeType } from 'antd/es/config-provider/SizeContext';
 import { CheckCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
@@ -17,7 +17,7 @@ export const FactsEditorAntd = ({ object, onChange = () => null }: FactsEditorPr
       style={{ width: '350px', margin: '4px' }}
       hoverable={true}
       title={
-        <span style={{color: (parsedValue ? 'green' : 'darkred')}}>
+        <span style={{ color: (parsedValue ? 'green' : 'darkred') }}>
           Facts are {parsedValue ? 'valid' : 'invalid'}.
         </span>
       }>
@@ -178,22 +178,22 @@ const RuleGroupEditorAntd = ({
   const isValidRule = processRuleOrGroup(facts, liveRules);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row'}} key={`group-edit-${index}-${depth}`}>
-      {showFactsEditor && depth === 0 && index === 0 &&
+    <div style={{ display: 'flex', flexDirection: 'row' }} key={`group-edit-${index}-${depth}`}>
+      {showFactsEditor && depth === 0 && index === 0 && FactsEditor && (
         <FactsEditor object={liveFacts} onChange={(stringValue, parsedValue) => {
           const isValid = !!parsedValue;
           if (isValid) {
             setLiveFacts(parsedValue);
           }
         }} />
-      }
+      )}
       <Card
         style={{ marginTop: '4px' }}
         hoverable={true}
         title={
           depth === 0 && index === 0 && <Space>
-            <span style={{color: (isValidRule ? 'green' : 'darkred') }} >Rule is {isValidRule ? 'valid' : 'invalid'}.</span>
-            <span style={{color: (isValidRule ? 'green' : 'darkred') }} >Rule is {isValidRule?.pass ? 'passing' : 'failing'}.</span>
+            <span style={{ color: (isValidRule ? 'green' : 'darkred') }} >Rule is {isValidRule ? 'valid' : 'invalid'}.</span>
+            <span style={{ color: (isValidRule ? 'green' : 'darkred') }} >Rule is {isValidRule?.pass ? 'passing' : 'failing'}.</span>
           </Space>
         }
       >
@@ -205,14 +205,19 @@ const RuleGroupEditorAntd = ({
           </div>
           <div>
             {ruleList.map((ruleEntry, ruleIndex) => Array.isArray(ruleEntry) ?
-              (<div style={{display: 'flex', flexDirection: 'row'}}>
+              (<div style={{ display: 'flex', flexDirection: 'row' }}>
                 <RuleEditorAntd
                   onUpdate={onRuleUpdate}
                   key={`${JSON.stringify(ruleEntry)}-${ruleIndex}-${depth}`}
                   {...{ rule: ruleEntry, facts: liveFacts, index: ruleIndex, depth }}
                 />
-                <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
-                  <Button size={userSize} icon={<PlusCircleOutlined />} title='add a rule' onClick={() => onAddRule(ruleIndex + 1)} />
+                <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap' }}>
+                  <Button
+                    size={userSize}
+                    icon={<PlusCircleOutlined />}
+                    title='add a rule'
+                    onClick={() => onAddRule(ruleIndex + 1)}
+                  />
                   {ruleIndex > 0 && <Button size={userSize} icon={<MinusCircleOutlined />} title='remove rule' onClick={() => onDeleteRule(ruleIndex)} />}
                 </div>
               </div>) :
@@ -220,10 +225,10 @@ const RuleGroupEditorAntd = ({
                 <RuleGroupEditorAntd
                   key={`${JSON.stringify(ruleEntry)}-${ruleIndex}-${depth}`}
                   extra={(ruleIndex > 0 ? () => (
-                    <Button 
-                      size={userSize} 
-                      title='remove group' 
-                      onClick={() => onDeleteRule(ruleIndex)} 
+                    <Button
+                      size={userSize}
+                      title='remove group'
+                      onClick={() => onDeleteRule(ruleIndex)}
                       icon={<MinusCircleOutlined />} />) : null)}
                   {...{
                     rules: ruleEntry as RuleGroup,

@@ -1,6 +1,7 @@
 export { ICRulesEditorAntd } from './RuleEditorAntd';
 import { Rule, RuleGroup } from '@icrules/core';
 import { ICRulesEditor } from './RuleEditor';
+import { FC } from 'react';
 
 export default ICRulesEditor;
 export { 
@@ -56,27 +57,27 @@ export interface RuleEditorProps {
 export interface RuleGroupEditorProps {
   facts?: any;
   rules?: RuleGroup;
-  onChange?: (RuleGroup, index, parentIndex?) => void;
+  onChange?: (rules: RuleGroup, index: number, parentIndex?: number) => void;
   depth?: number;
   index?: number;
   showFactsEditor?: boolean;
-  extra?: any;
-  FactsEditor?: React.FC<FactsEditorProps>;
+  extra?: () => JSX.Element | null;
+  FactsEditor?: FC<FactsEditorProps>;
 }
 
 export interface RulesEditorOptions {
   showFactsEditor?: boolean;
-  factsEditor?: React.FC<FactsEditorProps>;
+  factsEditor?: FC<FactsEditorProps>;
 }
 
 export interface FactsEditorProps {
   object: any;
-  onChange?: (string, any)=>void;
+  onChange?: (stringValue: string, parsedValue: any) => void;
 }
 
 export interface ICRulesEditorProps {
   rules: RuleGroup;
   facts: any;
-  onChange?: (RuleGroup) => void;
+  onChange?: (rules: RuleGroup) => void;
   options?: RulesEditorOptions;
 }

@@ -3,7 +3,7 @@ const path = require('path');
 const { lstatSync, readdirSync } = require('fs');
 const basePath = path.resolve(__dirname, 'packages');
 const packages = readdirSync(basePath).filter(name => (lstatSync(path.join(basePath, name)).isDirectory()));
-const esModules = ['antd', 'ngx-bootstrap'].join('|');
+const esModules = ['antd', '@ant-design', 'rc-util', 'rc-pagination', 'rc-picker', 'rc-notification', 'rc-tooltip'].join('|');
 
 module.exports = {
   preset: 'ts-jest',
@@ -12,13 +12,16 @@ module.exports = {
     '<rootDir>/packages/core/test/**/*.test.ts',
     '<rootDir>/packages/editor/test/**/*.test.ts*'
   ],
-  transformIgnorePatterns: [
-    '<rootDir>/packages/editor/node_modules/',
-    '<rootDir>/packages/core/node_modules/',
-  ],
-  moduleNameMapper: {
-    '\\.(css|less)$': '<rootDir>/css-stub.js'
+  transform: {
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: '<rootDir>/tsconfig.json'
+    }]
   },
+  moduleNameMapper: {
+    '\\.(css|less)$': '<rootDir>/css-stub.js',
+    '^@/(.*)$': '<rootDir>/src/$1'
+  },
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   verbose: true,
   collectCoverageFrom: [
     '<rootDir>/packages/editor/src/**/*.ts*',
