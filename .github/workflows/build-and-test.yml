@@ -40,7 +40,26 @@ jobs:
       # Test steps
       - name: Run tests with coverage
         run: npm test
+        
+      # Generate and extract coverage percentage
+      - name: Extract Coverage Percentage
+        id: extract_coverage
+        run: |
+          COVERAGE=$(node -e "const fs=require('fs'); const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json')); console.log(coverage.total.statements.pct)")
+          echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
+          echo "Coverage: $COVERAGE%"
       
+      # Create Coverage Badge
+      - name: Create Coverage Badge
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.COVERAGE_GIST_ID }}
+          filename: icrules-coverage.json
+          label: coverage
+          message: ${{ env.COVERAGE }}%
+          color: ${{ env.COVERAGE >= 90 && 'brightgreen' || env.COVERAGE >= 80 && 'green' || env.COVERAGE >= 70 && 'yellowgreen' || env.COVERAGE >= 60 && 'yellow' || 'red' }}
+          
       # Upload artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

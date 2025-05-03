@@ -1,7 +1,7 @@
 # ICRules
 
 [![Build and Test](https://github.com/ineffably/icrules/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/ineffably/icrules/actions/workflows/build-and-test.yml)
-[![Coverage](https://codecov.io/gh/ineffably/icrules/branch/main/graph/badge.svg)](https://codecov.io/gh/ineffably/icrules)
+[![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/ineffably/GIST_ID/raw/icrules-coverage.json)](https://github.com/ineffably/icrules/actions/workflows/build-and-test.yml)
 [![npm version](https://badge.fury.io/js/%40icrules%2Fcore.svg)](https://badge.fury.io/js/%40icrules%2Fcore)
 
 Intuitive Compact Rules

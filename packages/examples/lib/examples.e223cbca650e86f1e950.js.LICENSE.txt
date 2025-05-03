@@ -4,7 +4,127 @@
 	http://jedwatson.github.io/classnames
 */
 
+/*! !!../../../node_modules/css-loader/dist/cjs.js!./editorStyle.css */
+
+/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */
+
+/*! !../../../node_modules/style-loader/dist/runtime/insertBySelector.js */
+
+/*! !../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */
+
+/*! !../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */
+
+/*! !../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */
+
+/*! !../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */
+
+/*! . */
+
+/*! ../../../node_modules/css-loader/dist/runtime/api.js */
+
+/*! ../../../node_modules/css-loader/dist/runtime/sourceMaps.js */
+
+/*! ./RuleEditor */
+
+/*! ./RuleEditorAntd */
+
+/*! ./cjs/react-jsx-runtime.development.js */
+
+/*! ./editorStyle.css */
+
+/*! ./library/memoize */
+
+/*! @ant-design/icons */
+
+/*! @icrules/core */
+
+/*! antd */
+
+/*! react */
+
+/*! react/jsx-runtime */
+
 /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
+
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
+
+/*!***********************!*\
+  !*** external "antd" ***!
+  \***********************/
+
+/*!************************!*\
+  !*** external "react" ***!
+  \************************/
+
+/*!****************************!*\
+  !*** ../core/lib/index.js ***!
+  \****************************/
+
+/*!****************************!*\
+  !*** ./src/RuleEditor.tsx ***!
+  \****************************/
+
+/*!*****************************!*\
+  !*** ./src/editorStyle.css ***!
+  \*****************************/
+
+/*!********************************!*\
+  !*** ./src/RuleEditorAntd.tsx ***!
+  \********************************/
+
+/*!********************************!*\
+  !*** ./src/library/memoize.ts ***!
+  \********************************/
+
+/*!************************************!*\
+  !*** external "@ant-design/icons" ***!
+  \************************************/
+
+/*!***********************************************!*\
+  !*** ../../node_modules/react/jsx-runtime.js ***!
+  \***********************************************/
+
+/*!*********************************************************!*\
+  !*** ../../node_modules/css-loader/dist/runtime/api.js ***!
+  \*********************************************************/
+
+/*!****************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/runtime/sourceMaps.js ***!
+  \****************************************************************/
+
+/*!*******************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/styleDomAPI.js ***!
+  \*******************************************************************/
+
+/*!*********************************************************************!*\
+  !*** ../../node_modules/react/cjs/react-jsx-runtime.development.js ***!
+  \*********************************************************************/
+
+/*!***********************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!./src/editorStyle.css ***!
+  \***********************************************************************/
+
+/*!************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/insertBySelector.js ***!
+  \************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/styleTagTransform.js ***!
+  \*************************************************************************/
+
+/*!**************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/insertStyleElement.js ***!
+  \**************************************************************************/
+
+/*!********************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
+  \********************************************************************************/
+
+/*!**************************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js ***!
+  \**************************************************************************************/
 
 /**
  * @license React
@@ -19,6 +139,16 @@
 /**
  * @license React
  * react-is.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * @license React
+ * react-jsx-runtime.development.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
