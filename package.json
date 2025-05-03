@@ -9,6 +9,8 @@
     "gendocs": "npm run gendocs --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
     "examples": "npm run examples --workspace=@icrules/examples",
+    "examples:vite": "npm run examples:vite --workspace=@icrules/examples",
+    "dev": "npm run dev --workspace=@icrules/examples",
     "watch": "concurrently \"npm run watch --workspace=@icrules/core\" \"npm run watch --workspace=@icrules/editor\""
   },
   "keywords": [

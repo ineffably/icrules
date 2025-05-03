@@ -5,7 +5,7 @@ import { FC } from 'react';
 
 export default ICRulesEditor;
 export { 
-  ICRulesEditor
+  ICRulesEditor,
 }
 
 export const flattenKeys = (obj: any, prefix = ''): any => {

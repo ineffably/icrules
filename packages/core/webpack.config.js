@@ -4,6 +4,8 @@ const outDir = 'lib';
 
 const config = (env, argv = {}) => {
   const mode = argv.mode || 'production';
+  const isProduction = mode === 'production';
+
   const result = {
     mode,
     entry: './src/index.ts',
@@ -23,8 +25,12 @@ const config = (env, argv = {}) => {
     },
     resolve: {
       extensions: ['.ts', '.js']
+    },
+    optimization: {
+      minimize: isProduction
     }
   }
+  
   if (mode !== 'production') {
     result.devtool = 'inline-source-map';
   }

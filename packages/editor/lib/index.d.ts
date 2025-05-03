@@ -3,7 +3,7 @@ import { Rule, RuleGroup } from '@icrules/core';
 import { ICRulesEditor } from './RuleEditor';
 import { FC } from 'react';
 export default ICRulesEditor;
-export { ICRulesEditor };
+export { ICRulesEditor, };
 export declare const flattenKeys: (obj: any, prefix?: string) => any;
 export declare const safeParse: (textJson: string, showError?: boolean) => any | boolean;
 export declare const opMap: {
