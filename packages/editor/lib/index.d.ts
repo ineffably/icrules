@@ -1,4 +1,5 @@
 export { ICRulesEditorAntd } from './RuleEditorAntd';
+export { FactsEditorAntd } from './RuleEditorAntd';
 import { Rule, RuleGroup } from '@icrules/core';
 import { ICRulesEditor } from './RuleEditor';
 import { FC } from 'react';

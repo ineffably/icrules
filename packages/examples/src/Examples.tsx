@@ -1,14 +1,11 @@
 import { Card } from 'antd';
-import { ICRulesEditorAntd } from '@icrules/editor';
+import { FactsEditorAntd, ICRulesEditorAntd } from '@icrules/editor';
 import { useState } from 'react';
 import { type RuleGroup, processVerbose } from '@icrules/core';
 import { syntaxHighlight } from './utils';
 // Change the version import to avoid issues with package.json resolution
 // import { version } from '@icrules/editor/package.json';
 import './examples.css';
-
-// Use a constant for version since we can't easily import from package.json in Vite
-const EDITOR_VERSION = '0.2.3-alpha.0';
 
 export const Examples = () => {
   const rules = {
@@ -71,16 +68,26 @@ export const Examples = () => {
 
   return (
     <Card title={<b>ICRules Editor</b>} size='small'>
-      <div style={{ display: 'flex', flexDirection: 'row', width: '98vw' }}>
-        <div style={{ width: '100%' }}>
-          <ICRulesEditorAntd {...{ facts, rules: activeRules, onChange, options: { showFactsEditor: true } }} />
+      <div className="examples-container">
+        <div className="editor-container">
+          <ICRulesEditorAntd 
+            {...{ 
+              facts, 
+              rules: activeRules, 
+              onChange, 
+              options: { 
+                showFactsEditor: true, 
+                factsEditor: FactsEditorAntd 
+              } 
+            }} 
+          />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Card style={{ margin: '0 4px', width: '300px' }} title="Output: JSON rules" size='default' hoverable={true} styles={{ body: { padding: 0 } }} >
+        <div className="output-container">
+          <Card className="json-card" title="Output: JSON rules" size='default' hoverable={true} styles={{ body: { padding: 0 } }} >
             <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(activeRules, null, 2)) }}></pre>
           </Card>
-          <Card style={{ margin: '0 4px', padding: 0, width: '300px' }} title='Output: Verbose results' size='default' hoverable={true} styles={{ body: { padding: 0 } }}>
-            <div style={{ overflowY: 'auto', height: '80vh' }}>
+          <Card className="verbose-card" title='Output: Verbose results' size='default' hoverable={true} styles={{ body: { padding: 0 } }}>
+            <div className="verbose-content">
               <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify({ pass, group }, null, 2)) }}></pre>
             </div>
           </Card>
