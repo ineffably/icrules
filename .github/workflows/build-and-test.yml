@@ -57,10 +57,41 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Core Package: $(node -e "const fs=require('fs'); const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json')); console.log(coverage['packages/core/src/index.ts'].statements.pct)")%" >> $GITHUB_STEP_SUMMARY
       
-      # Update coverage badge
-      - name: Update Coverage Badge
+      # Create and commit the coverage badge directly to main branch
+      - name: Generate Coverage Badge
         if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        uses: we-cli/coverage-badge-action@main
+        run: |
+          # Create badges directory if it doesn't exist
+          mkdir -p badges
+          
+          # Get coverage percentage from the coverage summary
+          COV=$(node -e "const fs=require('fs'); const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json')); console.log(coverage.total.statements.pct)")
+          
+          # Determine badge color based on coverage
+          if [ $(echo "$COV >= 90" | bc -l) -eq 1 ]; then
+            COLOR="brightgreen"
+          elif [ $(echo "$COV >= 80" | bc -l) -eq 1 ]; then
+            COLOR="green"
+          elif [ $(echo "$COV >= 70" | bc -l) -eq 1 ]; then
+            COLOR="yellowgreen"
+          elif [ $(echo "$COV >= 60" | bc -l) -eq 1 ]; then
+            COLOR="yellow"
+          else
+            COLOR="red"
+          fi
+          
+          # Generate SVG badge
+          BADGE_SVG="<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"96\" height=\"20\" role=\"img\" aria-label=\"coverage: ${COV}%\"><title>coverage: ${COV}%</title><linearGradient id=\"s\" x2=\"0\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"/><stop offset=\"1\" stop-opacity=\".1\"/></linearGradient><clipPath id=\"r\"><rect width=\"96\" height=\"20\" rx=\"3\" fill=\"#fff\"/></clipPath><g clip-path=\"url(#r)\"><rect width=\"61\" height=\"20\" fill=\"#555\"/><rect x=\"61\" width=\"35\" height=\"20\" fill=\"#${COLOR}\"/><rect width=\"96\" height=\"20\" fill=\"url(#s)\"/></g><g fill=\"#fff\" text-anchor=\"middle\" font-family=\"Verdana,Geneva,DejaVu Sans,sans-serif\" text-rendering=\"geometricPrecision\" font-size=\"110\"><text aria-hidden=\"true\" x=\"315\" y=\"150\" fill=\"#010101\" fill-opacity=\".3\" transform=\"scale(.1)\" textLength=\"510\">coverage</text><text x=\"315\" y=\"140\" transform=\"scale(.1)\" fill=\"#fff\" textLength=\"510\">coverage</text><text aria-hidden=\"true\" x=\"775\" y=\"150\" fill=\"#010101\" fill-opacity=\".3\" transform=\"scale(.1)\" textLength=\"250\">${COV}%</text><text x=\"775\" y=\"140\" transform=\"scale(.1)\" fill=\"#fff\" textLength=\"250\">${COV}%</text></g></svg>"
+          
+          # Save the badge
+          echo "$BADGE_SVG" > badges/coverage.svg
+          
+          # Commit and push if there are changes
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add badges/coverage.svg
+          git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
+          git push
       
       # Upload artifacts
       - name: Upload build artifacts
