@@ -48,18 +48,20 @@ jobs:
           COVERAGE=$(node -e "const fs=require('fs'); const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json')); console.log(coverage.total.statements.pct)")
           echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
           echo "Coverage: $COVERAGE%"
-      
-      # Create Coverage Badge
-      - name: Create Coverage Badge
-        uses: schneegans/dynamic-badges-action@v1.6.0
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: ${{ secrets.COVERAGE_GIST_ID }}
-          filename: icrules-coverage.json
-          label: coverage
-          message: ${{ env.COVERAGE }}%
-          color: ${{ env.COVERAGE >= 90 && 'brightgreen' || env.COVERAGE >= 80 && 'green' || env.COVERAGE >= 70 && 'yellowgreen' || env.COVERAGE >= 60 && 'yellow' || 'red' }}
           
+      # Output the coverage as a job summary
+      - name: Output Coverage Summary
+        run: |
+          echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "Total Statement Coverage: ${{ env.COVERAGE }}%" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Core Package: $(node -e "const fs=require('fs'); const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json')); console.log(coverage['packages/core/src/index.ts'].statements.pct)")%" >> $GITHUB_STEP_SUMMARY
+      
+      # Update coverage badge
+      - name: Update Coverage Badge
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: we-cli/coverage-badge-action@main
+      
       # Upload artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -81,7 +83,6 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./coverage/
           fail_ci_if_error: false
           flags: unittests
