@@ -1,4 +1,4 @@
-import { type ICRulesEditorProps, type RuleEditorProps, FactsEditorProps } from '.';
+import { type ICRulesEditorProps, type RuleEditorProps, type FactsEditorProps } from '.';
 import './editorStyle.css';
 export declare const FactsEditorAntd: ({ object, onChange }: FactsEditorProps) => import("react/jsx-runtime").JSX.Element;
 export declare const RuleEditorAntd: ({ facts, rule, onUpdate, index, depth }: RuleEditorProps) => import("react/jsx-runtime").JSX.Element;

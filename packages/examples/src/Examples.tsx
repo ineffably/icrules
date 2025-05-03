@@ -1,9 +1,10 @@
 import { Card } from 'antd';
-import { ICRulesEditorAntd } from '@icrules/editor';
+import { FactsEditorAntd, ICRulesEditorAntd } from '@icrules/editor';
 import { useState } from 'react';
 import { type RuleGroup, processVerbose } from '@icrules/core';
 import { syntaxHighlight } from './utils';
-import { version } from '@icrules/editor/package.json';
+// Change the version import to avoid issues with package.json resolution
+// import { version } from '@icrules/editor/package.json';
 import './examples.css';
 
 export const Examples = () => {
@@ -29,6 +30,7 @@ export const Examples = () => {
     setActiveRules(rules);
   }
   const { pass, group } = processVerbose(facts, activeRules);
+
   const testFacts = {
     simple: {
       color: 'blue',
@@ -51,8 +53,8 @@ export const Examples = () => {
         purchased: [
           { name: 'service1', date: '2019-01-01' },
           { name: 'service2', date: '2018-01-01' },
-          { name: 'service3', date: '2020-01-01'  },
-          { name: 'service4', date: '2021-01-01'  },
+          { name: 'service3', date: '2020-01-01' },
+          { name: 'service4', date: '2021-01-01' },
         ],
       },
       subscriptions: [
@@ -64,19 +66,33 @@ export const Examples = () => {
     }
   }
 
-return (
-  <Card title={<b>ICRules Fancy Editor Example v{version} </b>} size='small'>
-    <div style={{ display: 'flex', flexDirection: 'row', width: '98vw' }}>
-      <ICRulesEditorAntd {...{ facts, rules: activeRules, onChange }} />
-      <Card style={{ margin: '0 4px' }} title={'JSON rules'} size='default' hoverable={true} styles={{ body: { padding: 0 } }} >
-        <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(activeRules, null, 2)) }}></pre>
-      </Card>
-      <Card style={{ margin: '0 4px', padding: 0 }} title='Verbose JSON rules and result' size='default' hoverable={true} styles={{ body: { padding: 0 } }}>
-        <div style={{ overflowY: 'auto', height: '80vh' }}>
-          <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify({ pass, group }, null, 2)) }}></pre>
+  return (
+    <Card title={<b>ICRules Editor</b>} size='small'>
+      <div className="examples-container">
+        <div className="editor-container">
+          <ICRulesEditorAntd 
+            {...{ 
+              facts, 
+              rules: activeRules, 
+              onChange, 
+              options: { 
+                showFactsEditor: true, 
+                factsEditor: FactsEditorAntd 
+              } 
+            }} 
+          />
         </div>
-      </Card>
-    </div>
-  </Card>
-)
+        <div className="output-container">
+          <Card className="json-card" title="Output: JSON rules" size='default' hoverable={true} styles={{ body: { padding: 0 } }} >
+            <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(activeRules, null, 2)) }}></pre>
+          </Card>
+          <Card className="verbose-card" title='Output: Verbose results' size='default' hoverable={true} styles={{ body: { padding: 0 } }}>
+            <div className="verbose-content">
+              <pre dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify({ pass, group }, null, 2)) }}></pre>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </Card>
+  )
 }

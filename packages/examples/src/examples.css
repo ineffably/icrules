@@ -22,3 +22,41 @@ pre {
 .key {
   color: red;
 }
+
+/* Editor Component Styles */
+.examples-container {
+  display: flex;
+  flex-direction: row;
+  width: 98vw;
+}
+
+.editor-container {
+  width: 100%;
+}
+
+.output-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.json-card {
+  margin: 0 4px;
+  width: 300px;
+}
+
+.verbose-card {
+  margin: 0 4px;
+  padding: 0;
+  width: 300px;
+}
+
+.verbose-content {
+  overflow-y: auto;
+  height: 80vh;
+}
+
+/* Make body styles more consistent */
+.card-body-no-padding {
+  padding: 0;
+}
