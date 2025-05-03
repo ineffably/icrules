@@ -38,7 +38,7 @@ jobs:
         run: npm run build --workspace=@icrules/examples
       
       # Test steps
-      - name: Run tests
+      - name: Run tests with coverage
         run: npm test
       
       # Upload artifacts
@@ -56,4 +56,15 @@ jobs:
         with:
           name: coverage-reports
           path: coverage/
-          retention-days: 7 
+          retention-days: 7
+          
+      # Upload coverage to Codecov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./coverage/
+          fail_ci_if_error: false
+          flags: unittests
+          name: icrules-coverage
+          verbose: true 
