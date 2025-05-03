@@ -38,11 +38,8 @@ jobs:
         run: npm run build --workspace=@icrules/examples
       
       # Test steps
-      - name: Run core tests
-        run: npm run test --workspace=@icrules/core
-      
-      - name: Run editor tests
-        run: npm run test --workspace=@icrules/editor
+      - name: Run tests
+        run: npm test
       
       # Upload artifacts
       - name: Upload build artifacts

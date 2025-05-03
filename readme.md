@@ -1,5 +1,8 @@
 # ICRules
 
+[![Build and Test](https://github.com/ineffably/icrules/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/ineffably/icrules/actions/workflows/build-and-test.yml)
+[![npm version](https://badge.fury.io/js/%40icrules%2Fcore.svg)](https://badge.fury.io/js/%40icrules%2Fcore)
+
 Intuitive Compact Rules
 
 An extensible JavaScript rules engine with serialized compact JSON container with a React based rules editor to generate rules.

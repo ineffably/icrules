@@ -39,6 +39,7 @@ export type ValueType = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 
 export declare const internalOperatorValues: Operator[];
 export declare function isGroup(testRule?: Rule | RuleGroup): boolean;
 export declare function flattenKeys(obj: any, prefix?: string, delimiter?: string): Record<string, any>;
+export declare const memoizedFlattenKeys: typeof flattenKeys;
 export declare const processResult: ({ pass, facts, rule, group, plugins }: ProcessArgs) => ProcessResult;
 export declare const internalOperators: OperatorPlugin;
 export declare function processRuleOrGroup(facts: Facts, rule: Rule | RuleGroup, options?: Options): ProcessResult;

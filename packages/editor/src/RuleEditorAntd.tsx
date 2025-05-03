@@ -1,6 +1,6 @@
-import { type Operator, type RuleGroup, internalOperatorValues, processRuleOrGroup, Quantifiers, Rule, processVerbose, flattenKeys } from '@icrules/core';
+import { type Operator, type RuleGroup, internalOperatorValues, processRuleOrGroup, Quantifiers, Rule, processVerbose } from '@icrules/core';
 import { useEffect, useState } from 'react';
-import { opMap, type ICRulesEditorProps, type RuleEditorProps, type RuleGroupEditorProps, type FactsEditorProps, safeParse } from '.';
+import { opMap, type ICRulesEditorProps, type RuleEditorProps, type RuleGroupEditorProps, FactsEditorProps, safeParse, flattenKeys } from '.';
 import { AutoComplete, Button, Card, Input, Select, Space, Tag, Tooltip } from 'antd';
 import { SizeType } from 'antd/es/config-provider/SizeContext';
 import { CheckCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';

@@ -1,11 +1,11 @@
-export { ICRulesEditorAntd } from './RuleEditorAntd';
 export { FactsEditorAntd } from './RuleEditorAntd';
+export { ICRulesEditorAntd } from './RuleEditorAntd';
 import { Rule, RuleGroup } from '@icrules/core';
 import { ICRulesEditor } from './RuleEditor';
-import { FC } from 'react';
+import React from 'react';
 export default ICRulesEditor;
 export { ICRulesEditor, };
-export declare const flattenKeys: (obj: any, prefix?: string) => any;
+export declare const flattenKeys: typeof import("@icrules/core").flattenKeys;
 export declare const safeParse: (textJson: string, showError?: boolean) => any | boolean;
 export declare const opMap: {
     eq: string;
@@ -34,12 +34,12 @@ export interface RuleGroupEditorProps {
     depth?: number;
     index?: number;
     showFactsEditor?: boolean;
-    extra?: () => JSX.Element | null;
-    FactsEditor?: FC<FactsEditorProps>;
+    extra?: any;
+    FactsEditor?: React.ComponentType<FactsEditorProps>;
 }
 export interface RulesEditorOptions {
     showFactsEditor?: boolean;
-    factsEditor?: FC<FactsEditorProps>;
+    factsEditor?: React.ComponentType<FactsEditorProps>;
 }
 export interface FactsEditorProps {
     object: any;

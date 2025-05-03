@@ -1,25 +1,16 @@
-export { ICRulesEditorAntd } from './RuleEditorAntd';
 export { FactsEditorAntd } from './RuleEditorAntd';
-import { Rule, RuleGroup } from '@icrules/core';
+export { ICRulesEditorAntd } from './RuleEditorAntd';
+import { Rule, RuleGroup, memoizedFlattenKeys as coreFlattenKeys } from '@icrules/core';
 import { ICRulesEditor } from './RuleEditor';
-import { FC } from 'react';
+import React from 'react';
 
 export default ICRulesEditor;
 export { 
   ICRulesEditor,
 }
 
-export const flattenKeys = (obj: any, prefix = ''): any => {
-  let result = {};
-  for (const key in obj) {
-    if (typeof obj[key] === 'object') {
-      result = { ...result, ...flattenKeys(obj[key], `${prefix}${key}.`) };
-    } else {
-      result[`${prefix}${key}`] = obj[key];
-    }
-  }
-  return result;
-}
+// Re-export the memoized version from core for better performance
+export const flattenKeys = coreFlattenKeys;
 
 export const safeParse = (textJson: string, showError = false): any | boolean => {
   try {
@@ -62,13 +53,13 @@ export interface RuleGroupEditorProps {
   depth?: number;
   index?: number;
   showFactsEditor?: boolean;
-  extra?: () => JSX.Element | null;
-  FactsEditor?: FC<FactsEditorProps>;
+  extra?: any;
+  FactsEditor?: React.ComponentType<FactsEditorProps>;
 }
 
 export interface RulesEditorOptions {
   showFactsEditor?: boolean;
-  factsEditor?: FC<FactsEditorProps>;
+  factsEditor?: React.ComponentType<FactsEditorProps>;
 }
 
 export interface FactsEditorProps {
